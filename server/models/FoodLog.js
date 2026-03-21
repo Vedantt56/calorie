@@ -2,19 +2,33 @@ import mongoose from "mongoose"
 
 const foodLogSchema = new mongoose.Schema({
 
-    foodName:{
-        type:String,
-        required:true
+    foodName: {
+        type: String,
+        required: true
+    },
+    protein: {
+        type: Number
     },
 
-    calories:{
-        type:Number,
-        required:true
+    fat: {
+        type: Number
+    },
+    carbs: {
+        type: Number
     },
 
-    createdAt:{
-        type:Date,
-        default:Date.now
+    quantity: {
+        type: Number,
+        required: true
+    },
+    calories: {
+        type: Number,
+        required: true
+    },
+
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
 
 })
