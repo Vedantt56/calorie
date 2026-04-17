@@ -1,32 +1,35 @@
-import OpenAI from "openai"
+import Groq from "groq-sdk"
 
 export const parseFoodText = async (text) => {
 
-    const client = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY
+    const groq = new Groq({
+        apiKey: process.env.GROQ_API_KEY
     })
 
-    const response = await client.chat.completions.create({
-        model: "gpt-4.1-mini",
+    const prompt = `
+Return ONLY JSON array.
+
+Format:
+[
+  { "foodName": "", "quantity": number }
+]
+
+Input:
+"${text}"
+`
+
+    const message = await groq.chat.completions.create({
         messages: [
             {
-                role: "system",
-                content: "Convert food description into JSON array with foodName and quantity."
-            },
-            {
                 role: "user",
-                content: `Convert this into JSON:
-                "${text}"
-
-                Format:
-                [
-                  { "foodName": "", "quantity": number }
-                ]`
+                content: prompt
             }
-        ]
+        ],
+        model: "llama-3.3-70b-versatile",
+        temperature: 0.2
     })
 
-    const output = response.choices[0].message.content
+    const output = message.choices[0].message.content
 
     const clean = output.replace(/```json|```/g, "").trim()
 
