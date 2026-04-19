@@ -9,13 +9,12 @@ export const getNutritionFromUSDA = async (foodName) => {
         })
 
         if (!res.data.foods || res.data.foods.length === 0) {
-            throw new Error("Food not found")
+            throw new Error(`Food not found in USDA database: ${foodName}`)
         }
 
         const food = res.data.foods[0]
 
         const nutrients = food.foodNutrients || []
-
         
         const getByNumber = (num) => {
             const nutrient = nutrients.find(n => n.nutrientNumber === num)
@@ -31,11 +30,6 @@ export const getNutritionFromUSDA = async (foodName) => {
 
     } catch (error) {
         console.log("USDA ERROR:", error.message)
-        return {
-            calories: 100,
-            protein: 0,
-            fat: 0,
-            carbs: 0
-        }
+        throw error;
     }
 }

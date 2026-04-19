@@ -16,7 +16,10 @@ app.use(express.json())
 
 // routes
 import foodRoutes from "./routes/foodRoutes.js"
+import authRoutes from "./routes/authRoutes.js"
+
 app.use("/api/food", foodRoutes)
+app.use("/api/auth", authRoutes)
 
 // test route
 app.get("/", (req,res)=>{
