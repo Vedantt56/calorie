@@ -72,7 +72,7 @@ a {
   opacity: 0.58;
   filter: blur(36px) saturate(0.98);
   background:
-    conic-gradient(from 185deg at 18% 38%, rgba(245, 179, 92, 0.24), transparent 18%, rgba(71, 123, 138, 0.11), transparent 46%, rgba(238, 213, 164, 0.14), transparent 70%, rgba(255, 139, 73, 0.15)),
+    conic-gradient(from 185deg at 18% 38%, #f5b35c3d, transparent 18%, rgba(71, 123, 138, 0.11), transparent 46%, rgba(238, 213, 164, 0.14), transparent 70%, rgba(255, 139, 73, 0.15)),
     linear-gradient(135deg, rgba(255, 244, 225, 0.05), transparent 42%);
   animation: meshDrift 34s ease-in-out infinite alternate;
 }
