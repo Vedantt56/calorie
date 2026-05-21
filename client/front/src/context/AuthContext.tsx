@@ -23,6 +23,8 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
+  loginWithToken: (token: string) => Promise<void>;
+  startGoogleLogin: () => void;
   updateProfile: (profileData: any) => Promise<void>;
   logout: () => void;
 }
@@ -53,6 +55,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('userInfo', JSON.stringify(data));
   };
 
+  const loginWithToken = async (token: string) => {
+    const { data } = await axios.get('/api/auth/me', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    setUser(data);
+    localStorage.setItem('userInfo', JSON.stringify(data));
+  };
+
+  const startGoogleLogin = () => {
+    window.location.href = '/api/auth/google';
+  };
+
   const updateProfile = async (profileData: any) => {
     if (!user) return;
     const { data } = await axios.put('/api/auth/profile', profileData, {
@@ -68,7 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, updateProfile, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, loginWithToken, startGoogleLogin, updateProfile, logout }}>
       {children}
     </AuthContext.Provider>
   );

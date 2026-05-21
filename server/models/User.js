@@ -12,8 +12,12 @@ const userSchema = new mongoose.Schema({
     unique: true
   },
   password: {
+    type: String
+  },
+  googleId: {
     type: String,
-    required: true
+    unique: true,
+    sparse: true
   },
   createdAt: {
     type: Date,
@@ -43,6 +47,7 @@ userSchema.pre('save', async function() {
 
 // Method to compare passwords
 userSchema.methods.comparePassword = async function(enteredPassword) {
+  if (!this.password) return false;
   return await bcrypt.compare(enteredPassword, this.password);
 };
 

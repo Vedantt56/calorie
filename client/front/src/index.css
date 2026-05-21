@@ -9,4 +9,435 @@
 
 body {
   font-family: var(--font-sans);
+  margin: 0;
+  background: #050506;
+  color: #ffffff;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+html {
+  background: #050506;
+  scroll-behavior: auto;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.landing-grid {
+  background-image:
+    linear-gradient(rgba(244, 241, 234, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(244, 241, 234, 0.04) 1px, transparent 1px);
+  background-size: 96px 96px;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 62%, transparent 100%);
+}
+
+.atmosphere {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg, rgba(245, 179, 92, 0.1), transparent 34%),
+    linear-gradient(180deg, #070608 0%, #050506 56%, #090706 100%);
+}
+
+.mesh-field {
+  position: absolute;
+  inset: -18%;
+  opacity: 0.58;
+  filter: blur(36px) saturate(0.98);
+  background:
+    conic-gradient(from 185deg at 18% 38%, rgba(245, 179, 92, 0.24), transparent 18%, rgba(71, 123, 138, 0.11), transparent 46%, rgba(238, 213, 164, 0.14), transparent 70%, rgba(255, 139, 73, 0.15)),
+    linear-gradient(135deg, rgba(255, 244, 225, 0.05), transparent 42%);
+  animation: meshDrift 34s ease-in-out infinite alternate;
+}
+
+.light-field {
+  position: absolute;
+  width: 62vw;
+  height: 62vw;
+  min-width: 560px;
+  min-height: 560px;
+  opacity: 0.42;
+  filter: blur(46px);
+  mix-blend-mode: screen;
+  background: radial-gradient(ellipse at center, rgba(245, 179, 92, 0.2), rgba(245, 179, 92, 0.07) 34%, transparent 68%);
+}
+
+.light-field-a {
+  left: 8%;
+  top: 10%;
+  animation: lightFloatA 42s ease-in-out infinite alternate;
+}
+
+.light-field-b {
+  right: -16%;
+  bottom: 4%;
+  opacity: 0.36;
+  background: radial-gradient(ellipse at center, rgba(105, 184, 204, 0.14), rgba(240, 213, 169, 0.06) 38%, transparent 70%);
+  animation: lightFloatB 48s ease-in-out infinite alternate;
+}
+
+.depth-fog {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 26%, transparent 74%, rgba(255, 255, 255, 0.025)),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.28), transparent 22%, transparent 78%, rgba(0, 0, 0, 0.32));
+}
+
+.ambient-particles {
+  position: absolute;
+  inset: 0;
+  opacity: 0.18;
+  background-image:
+    radial-gradient(circle, rgba(244, 241, 234, 0.34) 0 1px, transparent 1.4px),
+    radial-gradient(circle, rgba(245, 179, 92, 0.14) 0 1px, transparent 1.5px);
+  background-position: 0 0, 36px 52px;
+  background-size: 132px 132px, 180px 180px;
+  mask-image: linear-gradient(to bottom, transparent, black 18%, black 72%, transparent);
+  animation: particleDrift 90s linear infinite;
+}
+
+.cinematic-vignette {
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 180px rgba(0, 0, 0, 0.72), inset 0 -180px 220px rgba(0, 0, 0, 0.42);
+}
+
+.atmosphere-soft .mesh-field {
+  opacity: 0.48;
+}
+
+.atmosphere-deep .mesh-field {
+  opacity: 0.44;
+  filter: blur(44px) saturate(0.92);
+}
+
+.atmosphere-deep .ambient-particles {
+  opacity: 0.18;
+}
+
+.scene-focal {
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(245, 179, 92, 0.16), rgba(245, 179, 92, 0.06) 34%, transparent 68%),
+    radial-gradient(ellipse at 62% 58%, rgba(105, 184, 204, 0.1), transparent 58%);
+}
+
+.product-render {
+  position: relative;
+}
+
+.product-render::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), transparent 34%, rgba(255, 255, 255, 0.04));
+  mask-image: linear-gradient(#000, transparent 60%);
+  opacity: 0.7;
+}
+
+.product-render::after {
+  content: '';
+  position: absolute;
+  inset: auto 10% -18px;
+  height: 28px;
+  pointer-events: none;
+  border-radius: 999px;
+  background: rgba(245, 179, 92, 0.16);
+  filter: blur(26px);
+}
+
+.hero-visual-system {
+  position: absolute;
+  right: -8%;
+  top: 13%;
+  z-index: -1;
+  width: min(44vw, 560px);
+  height: min(44vw, 560px);
+  pointer-events: none;
+  opacity: 0.92;
+}
+
+.nutrition-planet {
+  position: absolute;
+  inset: 13%;
+  overflow: hidden;
+  border-radius: 42% 58% 52% 48%;
+  border: 1px solid rgba(255, 229, 188, 0.14);
+  box-shadow:
+    0 46px 140px rgba(0, 0, 0, 0.58),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transform: rotate(-8deg);
+}
+
+.nutrition-planet img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.78) contrast(1.02) brightness(0.72);
+  transform: scale(1.12);
+}
+
+.nutrition-planet::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(120deg, rgba(0, 0, 0, 0.08), rgba(255, 194, 115, 0.16), transparent 52%),
+    radial-gradient(ellipse at 50% 50%, transparent 35%, rgba(0, 0, 0, 0.62) 100%);
+}
+
+.scan-ring {
+  position: absolute;
+  inset: 8%;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 222, 178, 0.26);
+  transform: rotate(12deg);
+  animation: scanPulse 5.8s ease-in-out infinite;
+}
+
+.scan-ring-two {
+  inset: 22%;
+  border-color: rgba(115, 210, 230, 0.2);
+  animation-delay: 1.2s;
+}
+
+.scan-beam {
+  position: absolute;
+  inset: -40% 46%;
+  background: linear-gradient(180deg, transparent, rgba(255, 210, 150, 0.3), transparent);
+  filter: blur(8px);
+  transform: rotate(18deg);
+  animation: scanSweep 7.2s ease-in-out infinite;
+}
+
+.energy-ribbon {
+  position: absolute;
+  width: 105%;
+  height: 26%;
+  border: 1px solid rgba(255, 220, 174, 0.16);
+  border-color: rgba(255, 220, 174, 0.2) transparent transparent transparent;
+  border-radius: 50%;
+  filter: blur(0.2px);
+}
+
+.energy-ribbon-one {
+  left: -8%;
+  top: 38%;
+  transform: rotate(-14deg);
+  animation: ribbonDrift 9s ease-in-out infinite alternate;
+}
+
+.energy-ribbon-two {
+  left: 3%;
+  top: 52%;
+  border-color: rgba(114, 203, 225, 0.18) transparent transparent transparent;
+  transform: rotate(18deg);
+  animation: ribbonDrift 11s ease-in-out infinite alternate-reverse;
+}
+
+.data-constellation span {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 224, 181, 0.68);
+  box-shadow: 0 0 22px rgba(255, 196, 118, 0.5);
+}
+
+.data-constellation span:nth-child(1) { left: 12%; top: 24%; }
+.data-constellation span:nth-child(2) { right: 16%; top: 18%; background: rgba(141, 220, 236, 0.55); }
+.data-constellation span:nth-child(3) { left: 22%; bottom: 18%; }
+.data-constellation span:nth-child(4) { right: 12%; bottom: 28%; background: rgba(141, 220, 236, 0.48); }
+
+.nutrition-landscape {
+  position: absolute;
+  left: -9%;
+  right: 12%;
+  bottom: -12%;
+  height: 38%;
+  overflow: hidden;
+  border-radius: 2rem;
+  opacity: 0.24;
+  transform: perspective(900px) rotateX(58deg) rotateZ(-4deg);
+  box-shadow: 0 38px 120px rgba(0, 0, 0, 0.46);
+}
+
+.nutrition-landscape img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.72) contrast(1.05) brightness(0.68);
+  transform: scale(1.16);
+}
+
+.landscape-scan {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 207, 143, 0.24), transparent),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 42px);
+  animation: landscapeScan 8s linear infinite;
+}
+
+@keyframes meshDrift {
+  from {
+    transform: translate3d(-2%, -1%, 0) rotate(0deg) scale(1);
+  }
+
+  to {
+    transform: translate3d(2%, 2%, 0) rotate(10deg) scale(1.05);
+  }
+}
+
+@keyframes scanPulse {
+  0%, 100% {
+    opacity: 0.34;
+    transform: scale(0.96) rotate(12deg);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(1.03) rotate(18deg);
+  }
+}
+
+@keyframes scanSweep {
+  0%, 100% {
+    transform: translateX(-180%) rotate(18deg);
+    opacity: 0;
+  }
+
+  35%, 65% {
+    opacity: 0.75;
+  }
+
+  50% {
+    transform: translateX(180%) rotate(18deg);
+  }
+}
+
+@keyframes ribbonDrift {
+  from {
+    transform: translateY(-8px) rotate(-14deg);
+  }
+
+  to {
+    transform: translateY(12px) rotate(-7deg);
+  }
+}
+
+@keyframes landscapeScan {
+  from {
+    background-position: -240px 0, 0 0;
+  }
+
+  to {
+    background-position: 240px 0, 84px 0;
+  }
+}
+
+@keyframes lightFloatA {
+  from {
+    transform: translate3d(-4%, -2%, 0) scale(1);
+  }
+
+  to {
+    transform: translate3d(8%, 5%, 0) scale(1.08);
+  }
+}
+
+@keyframes lightFloatB {
+  from {
+    transform: translate3d(3%, 4%, 0) scale(1);
+  }
+
+  to {
+    transform: translate3d(-8%, -5%, 0) scale(1.12);
+  }
+}
+
+@keyframes particleDrift {
+  from {
+    background-position: 0 0, 36px 52px;
+  }
+
+  to {
+    background-position: 132px 132px, 216px 232px;
+  }
+}
+
+.hero-dashboard,
+.float-layer,
+.pin-stage,
+.macro-card,
+.dash-panel,
+.feature-card,
+.final-cta-content {
+  will-change: transform, opacity;
+}
+
+.typed-meal {
+  will-change: width;
+}
+
+.dashboard-fade-in {
+  animation: dashboardFadeIn 360ms ease-out both;
+}
+
+@keyframes dashboardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .hero-dashboard,
+  .macro-card,
+  .dash-panel,
+  .feature-card,
+  .final-cta-content {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .typed-meal {
+    width: auto !important;
+  }
+
+  .mesh-field,
+  .light-field,
+  .ambient-particles,
+  .scan-ring,
+  .scan-beam,
+  .energy-ribbon,
+  .landscape-scan {
+    animation: none !important;
+  }
+
+  .dashboard-fade-in {
+    animation: none !important;
+  }
 }

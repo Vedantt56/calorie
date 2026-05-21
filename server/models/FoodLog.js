@@ -21,7 +21,7 @@ const foodLogSchema = new mongoose.Schema({
     },
     unit: {
         type: String,
-        enum: ['gm', 'cup', 'bowl', 'piece', 'katori'],
+        enum: ['gm', 'bowl', 'piece', 'katori', 'ounce'],
         default: 'gm'
     },
     size: {
@@ -33,6 +33,25 @@ const foodLogSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    totalGrams: {
+        type: Number
+    },
+    source: {
+        type: String,
+        enum: ['local_cooked_db', 'category_estimate', 'generic_indian_estimate', 'usda', null],
+        default: null
+    },
+    confidence: {
+        type: String,
+        enum: ['high', 'medium', 'low', null],
+        default: null
+    },
+    matchedFoodName: {
+        type: String
+    },
+    estimateModifiers: [{
+        type: String
+    }],
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

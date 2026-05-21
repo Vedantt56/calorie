@@ -1,26 +1,25 @@
 import FoodLog from "../models/FoodLog.js"
-import { getNutritionFromUSDA } from "../services/usdaservice.js"
 import { parseFoodText } from "../services/aiservices.js"
-import { convertMacros } from "../utils/unitmap.js"
+import { estimateFoodNutrition } from "../services/foodEstimator.js"
 
 const processAndLogFood = async (item, userId) => {
-    const { foodName, quantity, unit = 'gm', size = null } = item;
-    
-    // Fetch from USDA (which is per 100g)
-    const nutritionPer100g = await getNutritionFromUSDA(foodName);
-    
-    // Convert to actual macros based on user's unit
-    const finalNutrition = convertMacros(nutritionPer100g, quantity, unit, size);
+    const { foodName } = item;
+    const finalNutrition = await estimateFoodNutrition(item);
 
     const newFood = new FoodLog({
         foodName,
-        quantity,
-        unit,
-        size,
+        quantity: finalNutrition.quantity,
+        unit: finalNutrition.unit,
+        size: finalNutrition.size,
         calories: finalNutrition.calories,
         protein: finalNutrition.protein,
         fat: finalNutrition.fat,
         carbs: finalNutrition.carbs,
+        totalGrams: finalNutrition.totalGrams,
+        source: finalNutrition.source,
+        confidence: finalNutrition.confidence,
+        matchedFoodName: finalNutrition.matchedFoodName,
+        estimateModifiers: finalNutrition.estimateModifiers,
         user: userId
     });
 

@@ -164,52 +164,52 @@ export default function Dashboard() {
   const eatenFat = Number(logs.reduce((acc, log) => acc + (log.fat ?? 0), 0).toFixed(1));
 
   return (
-    <div className="min-h-screen bg-[#f8f9fd] font-sans pb-24 md:pb-0 md:pl-20 text-zinc-800 transition-all duration-300">
+    <div className="dashboard-scale dashboard-fade-in min-h-screen bg-[#f8f9fd] font-sans pb-24 md:pb-0 md:pl-18 text-zinc-800 transition-all duration-300">
       
       {/* Desktop Sidebar (Hover-to-Expand) */}
       <aside 
         onMouseEnter={() => setIsSidebarExpanded(true)}
         onMouseLeave={() => setIsSidebarExpanded(false)}
-        className={`hidden md:flex flex-col items-start justify-between bg-[#1c1c1e] fixed left-0 top-0 bottom-0 py-8 rounded-r-[2.5rem] text-zinc-400 transition-all duration-300 ease-in-out z-50 overflow-hidden shadow-2xl ${
-          isSidebarExpanded ? 'w-64 px-6' : 'w-20 px-0 items-center'
+        className={`hidden md:flex flex-col items-start justify-between bg-[#1c1c1e] fixed left-0 top-0 bottom-0 py-8 rounded-r-[2.5rem] text-zinc-400 transition-all duration-300 ease-in-out z-[100] overflow-hidden shadow-2xl ${
+          isSidebarExpanded ? 'w-64 px-2' : 'w-20 px-0 items-center'
         }`}
       >
-        <div className={`flex items-center gap-4 transition-all duration-300 ${isSidebarExpanded ? 'w-full px-6' : 'px-0'}`}>
+        <div className={`flex items-center gap-4 transition-all duration-300 ${isSidebarExpanded ? 'w-full px-4' : 'px-0'}`}>
            <div className="w-10 h-10 bg-[#adff00] rounded-xl flex items-center justify-center font-bold text-black text-xl shrink-0">
             N
           </div>
-          <span className={`font-bold text-white text-xl transition-all duration-300 whitespace-nowrap ${isSidebarExpanded ? 'opacity-100' : 'opacity-0 w-0'}`}>
+          <span className={`font-bold text-white text-xl transition-all duration-300 whitespace-nowrap ${isSidebarExpanded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 w-0 pointer-events-none'}`}>
             NutriFlow
           </span>
         </div>
 
-        <nav className="flex flex-col gap-2 w-full px-3">
+        <nav className="flex flex-col gap-2 w-full">
           <NavItem icon={<Home />} label="Dashboard" active expanded={isSidebarExpanded} />
           <NavItem icon={<Utensils />} label="My Meals" expanded={isSidebarExpanded} />
           <NavItem icon={<Activity />} label="Health Stats" expanded={isSidebarExpanded} />
           <NavItem icon={<TrendingUp />} label="Progress" expanded={isSidebarExpanded} />
           <NavItem icon={<Calendar />} label="History" expanded={isSidebarExpanded} />
-          <div className="h-px bg-zinc-800 my-4" />
+          <div className="h-px bg-zinc-800 my-4 mx-3" />
           <NavItem icon={<Settings />} label="Settings" expanded={isSidebarExpanded} />
         </nav>
 
-        <div className={`mt-auto flex items-center gap-3 w-full transition-all duration-300 ${isSidebarExpanded ? 'px-2' : ''}`}>
+        <div className={`mt-auto flex items-center gap-4 w-full transition-all duration-300 ${isSidebarExpanded ? 'px-4' : ''}`}>
           <div className="w-10 h-10 rounded-full bg-zinc-700 border-2 border-zinc-600 overflow-hidden shrink-0">
             <img src="https://picsum.photos/seed/user/100/100" alt="User" referrerPolicy="no-referrer" />
           </div>
-          <div className={`flex flex-col transition-all duration-300 whitespace-nowrap ${isSidebarExpanded ? 'opacity-100' : 'opacity-0 w-0'}`}>
-            <span className="text-white font-semibold text-sm">{user?.name || 'Guest'}</span>
-            <span className="text-zinc-500 text-[10px]">Premium Member</span>
+          <div className={`flex flex-col transition-all duration-300 whitespace-nowrap ${isSidebarExpanded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 w-0 pointer-events-none'}`}>
+            <span className="text-white font-semibold text-sm leading-tight">{user?.name || 'Guest'}</span>
+            <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">Premium</span>
           </div>
-          {isSidebarExpanded && <LogOut className="w-4 h-4 ml-auto hover:text-white cursor-pointer" onClick={logout} />}
+          {isSidebarExpanded && <LogOut className="w-4 h-4 ml-auto hover:text-white cursor-pointer transition-colors" onClick={logout} />}
         </div>
       </aside>
 
-      <main className="max-w-[1600px] mx-auto p-4 md:p-10 lg:p-12">
+      <main className="max-w-[1500px] mx-auto p-4 md:p-7 lg:p-8">
         {/* Header */}
-        <header className="flex justify-between items-center mb-10">
+        <header className="flex justify-between items-center mb-7">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 mb-1">Welcome back, {user?.name?.split(' ')[0] || 'Guest'}! 👋</h1>
+            <h1 className="text-2xl font-extrabold tracking-tight text-zinc-900 mb-1">Welcome back, {user?.name?.split(' ')[0] || 'Guest'}! 👋</h1>
             <p className="text-zinc-500 font-medium">Your nutrition summary for today is looking great.</p>
           </div>
           <div className="flex gap-4 items-center">
@@ -229,18 +229,18 @@ export default function Dashboard() {
           </div>
         </header>
 
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
           
           {/* Main Dashboard Area (Left/Middle) */}
-          <div className="xl:col-span-8 space-y-8">
+          <div className="xl:col-span-8 space-y-6">
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {/* Body Overview Card */}
-              <div className="bg-[#1c1c1e] text-white rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden h-full flex flex-col justify-between">
+              <div className="bg-[#1c1c1e] text-white rounded-[2rem] p-6 shadow-2xl relative overflow-hidden h-full flex flex-col justify-between">
                 <div>
                    <div className="flex justify-between items-start mb-6">
                      <div>
-                       <h2 className="text-2xl font-bold tracking-tight text-zinc-100">Body Overview</h2>
+                       <h2 className="text-xl font-bold tracking-tight text-zinc-100">Body Overview</h2>
                        <p className="text-sm text-zinc-400 mt-1">Keep crushing your macro goals!</p>
                      </div>
                      <button className="bg-zinc-800 p-2 border border-zinc-700 rounded-xl hover:bg-zinc-700 transition-colors text-zinc-400 hover:text-white">
@@ -249,7 +249,7 @@ export default function Dashboard() {
                    </div>
                    
                    <div className="text-center my-8">
-                     <div className="text-6xl font-black font-mono tracking-tighter text-white mb-2">{Math.max(targets.calories - eatenCalories, 0)}</div>
+                     <div className="text-5xl font-black font-mono tracking-tighter text-white mb-2">{Math.max(targets.calories - eatenCalories, 0)}</div>
                      <div className="text-zinc-400 font-bold tracking-widest text-xs uppercase">Calories Remaining</div>
                    </div>
                 </div>
@@ -262,11 +262,11 @@ export default function Dashboard() {
               </div>
 
               {/* Inspiration Card with Image */}
-              <div className="bg-white rounded-[2.5rem] shadow-sm border border-zinc-100 overflow-hidden relative group h-full flex flex-col">
-                <img src={mealBowlImg} className="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110" alt="Healthy Meal" />
-                <div className="p-8">
+              <div className="bg-white rounded-[2rem] shadow-sm border border-zinc-100 overflow-hidden relative group h-full flex flex-col">
+                <img src={mealBowlImg} className="w-full h-40 object-cover transition-transform duration-700 group-hover:scale-110" alt="Healthy Meal" />
+                <div className="p-6">
                   <span className="text-[10px] font-bold text-[#8e85fd] uppercase tracking-[0.2em] mb-2 block">Daily Inspiration</span>
-                  <h3 className="text-2xl font-extrabold text-zinc-900 leading-tight mb-3">Harvest Power Bowl with Quinoa</h3>
+                  <h3 className="text-xl font-extrabold text-zinc-900 leading-tight mb-3">Harvest Power Bowl with Quinoa</h3>
                   <p className="text-zinc-500 text-sm leading-relaxed mb-4">High in fiber and Omega-3s. Perfect for sustained energy throughout your afternoon.</p>
                   <button className="text-sm font-bold text-zinc-900 flex items-center gap-2 group/btn">
                     View Recipe <ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
@@ -278,10 +278,10 @@ export default function Dashboard() {
             {/* Daily Target Grid */}
             <div>
               <div className="flex justify-between items-center mb-6">
-                <h3 className="font-bold text-2xl tracking-tight text-zinc-900">Health Matrix</h3>
+                <h3 className="font-bold text-xl tracking-tight text-zinc-900">Health Matrix</h3>
                 <button className="text-[#8e85fd] text-sm font-bold hover:underline">View Analytics</button>
               </div>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard icon={<Droplet fill="#3b82f6" className="text-blue-500 w-5 h-5" />} title="Water Intake" value="1200 ml" subtitle="Target 2500 ml" color="blue" />
                 <StatCard icon={<Flame fill="#f97316" className="text-orange-500 w-5 h-5" />} title="Calories Eaten" value={`${eatenCalories} kcal`} subtitle="Consumed Today" color="orange" />
                 <StatCard icon={<Scale fill="#ec4899" className="text-pink-500 w-5 h-5" />} title="Body Weight" value={`${targets.weight} Kg`} subtitle="Stable Trend" color="pink" />
@@ -290,31 +290,31 @@ export default function Dashboard() {
             </div>
 
             {/* Feature Gallery */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-               <div className="bg-[#cdff7f] rounded-[2rem] p-8 relative overflow-hidden h-56 flex flex-col justify-end transition-all hover:translate-y-[-4px] cursor-pointer shadow-sm">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+               <div className="bg-[#cdff7f] rounded-[1.75rem] p-6 relative overflow-hidden h-48 flex flex-col justify-end transition-all hover:translate-y-[-4px] cursor-pointer shadow-sm">
                   <div className="absolute top-6 left-6 bg-white/40 backdrop-blur-md p-3 rounded-2xl">
                     <Droplet className="w-6 h-6 text-lime-900" />
                   </div>
-                  <h4 className="font-extrabold text-2xl z-10 leading-tight text-lime-950">Water<br/>Tracker</h4>
+                  <h4 className="font-extrabold text-xl z-10 leading-tight text-lime-950">Water<br/>Tracker</h4>
                   <p className="text-sm font-bold text-lime-900/60 z-10 mt-1 uppercase tracking-wider">Stay Refreshed</p>
                   <img src="https://picsum.photos/seed/water/300/300" className="absolute top-0 right-0 opacity-20 object-cover w-full h-full mix-blend-multiply" alt="" />
                </div>
 
-               <div className="bg-zinc-900 text-white rounded-[2rem] p-8 relative overflow-hidden h-56 flex flex-col justify-end transition-all hover:translate-y-[-4px] cursor-pointer shadow-lg group">
+               <div className="bg-zinc-900 text-white rounded-[1.75rem] p-6 relative overflow-hidden h-48 flex flex-col justify-end transition-all hover:translate-y-[-4px] cursor-pointer shadow-lg group">
                   <div className="absolute top-6 right-6 bg-zinc-800/80 p-3 rounded-2xl backdrop-blur-md border border-zinc-700 z-20">
                     <Lock className="w-5 h-5 text-amber-400" />
                   </div>
-                  <h4 className="font-extrabold text-2xl z-10 leading-tight">Meal<br/>Prepper</h4>
+                  <h4 className="font-extrabold text-xl z-10 leading-tight">Meal<br/>Prepper</h4>
                   <p className="text-sm font-bold text-zinc-500 z-10 mt-1 uppercase tracking-wider">Pro Feature</p>
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10"></div>
                   <img src={ingredientsImg} className="absolute inset-0 object-cover w-full h-full opacity-40 group-hover:scale-105 transition-transform duration-700" alt="" />
                </div>
 
-               <div className="bg-[#8e85fd] text-white rounded-[2rem] p-8 relative overflow-hidden h-56 flex flex-col justify-end transition-all hover:translate-y-[-4px] cursor-pointer shadow-sm group">
+               <div className="bg-[#8e85fd] text-white rounded-[1.75rem] p-6 relative overflow-hidden h-48 flex flex-col justify-end transition-all hover:translate-y-[-4px] cursor-pointer shadow-sm group">
                   <div className="absolute top-6 left-6 bg-white/20 backdrop-blur-md p-3 rounded-2xl">
                     <Activity className="w-6 h-6 text-white" />
                   </div>
-                  <h4 className="font-extrabold text-2xl z-10 leading-tight">Activity<br/>Insights</h4>
+                  <h4 className="font-extrabold text-xl z-10 leading-tight">Activity<br/>Insights</h4>
                   <p className="text-sm font-bold text-white/60 z-10 mt-1 uppercase tracking-wider">Burn More</p>
                   <img src="https://picsum.photos/seed/fitness/300/300" className="absolute top-0 right-0 opacity-20 object-cover w-full h-full mix-blend-overlay group-hover:rotate-3 transition-transform duration-700" alt="" />
                </div>
@@ -325,9 +325,9 @@ export default function Dashboard() {
           <div className="xl:col-span-4 space-y-8">
             
             {/* Today's Meals Panel */}
-            <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-zinc-100 flex flex-col h-full sticky top-12">
+            <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-zinc-100 flex flex-col h-full sticky top-8">
                <div className="flex justify-between items-center mb-8">
-                 <h3 className="font-bold text-2xl tracking-tight text-zinc-900">Today's Meals</h3>
+                 <h3 className="font-bold text-xl tracking-tight text-zinc-900">Today's Meals</h3>
                  <div className="flex gap-2">
                     <button onClick={() => setCurrentDate(subDays(currentDate, 1))} className="p-2 bg-zinc-50 rounded-lg hover:bg-zinc-100 transition-colors">
                       <ChevronLeft className="w-4 h-4" />
@@ -477,14 +477,14 @@ export default function Dashboard() {
 
 function NavItem({ icon, label, active = false, expanded = false }: { icon: React.ReactNode, label: string, active?: boolean, expanded?: boolean }) {
   return (
-    <div className={`flex items-center gap-4 transition-all duration-300 group ${
-      active ? 'bg-[#adff00] text-black shadow-md shadow-[#adff00]/10' : 'hover:bg-zinc-800 hover:text-white'
-    } ${expanded ? 'w-full px-4 py-3.5 rounded-2xl' : 'w-10 h-10 rounded-xl justify-center ml-0.5'}`}>
-      <div className={`transition-transform duration-300 flex items-center justify-center ${active ? 'scale-110' : 'group-hover:scale-110'}`}>
+    <div className={`flex items-center gap-4 transition-all duration-300 group cursor-pointer ${
+      active ? 'bg-[#adff00] text-black shadow-lg shadow-[#adff00]/20' : 'hover:bg-zinc-800/50 hover:text-white text-zinc-400'
+    } ${expanded ? 'w-full px-4 py-3 rounded-2xl' : 'w-10 h-10 rounded-xl justify-center'}`}>
+      <div className={`w-10 h-10 flex items-center justify-center shrink-0 transition-transform duration-300 ${active ? 'scale-110' : 'group-hover:scale-110'}`}>
         {React.isValidElement(icon) && React.cloneElement(icon as React.ReactElement, { className: "w-6 h-6" } as any)}
       </div>
       <span className={`font-bold text-sm whitespace-nowrap transition-all duration-300 ${
-        expanded ? 'opacity-100' : 'opacity-0 w-0 pointer-events-none'
+        expanded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 w-0 pointer-events-none'
       }`}>
         {label}
       </span>

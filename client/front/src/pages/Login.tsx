@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, LogIn, Github, Chrome as Google, Facebook, Apple, Loader2, Target } from 'lucide-react';
+import { Mail, Lock, LogIn, Chrome as Google, Facebook, Apple, Loader2 } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, startGoogleLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -17,7 +17,7 @@ export default function Login() {
     setError('');
     try {
       await login(email, password);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to login');
     } finally {
@@ -114,9 +114,9 @@ export default function Login() {
           </div>
 
           <div className="grid grid-cols-3 gap-4">
-            <SocialButton icon={<Google className="text-red-500" />} />
-            <SocialButton icon={<Facebook className="text-blue-600" />} />
-            <SocialButton icon={<Apple className="text-black" />} />
+            <SocialButton label="Sign in with Google" icon={<Google />} onClick={startGoogleLogin} />
+            <SocialButton icon={<Facebook />} />
+            <SocialButton icon={<Apple />} />
           </div>
 
           <div className="mt-10 text-center animate-in fade-in" style={{ animationDelay: '0.5s', animationFillMode: 'both' }}>
@@ -130,10 +130,24 @@ export default function Login() {
   );
 }
 
-function SocialButton({ icon }: { icon: React.ReactNode }) {
+function SocialButton({
+  icon,
+  label,
+  onClick
+}: {
+  icon: React.ReactNode;
+  label?: string;
+  onClick?: () => void;
+}) {
   return (
-    <button className="flex items-center justify-center py-4 bg-white border border-zinc-100 rounded-2xl shadow-sm hover:bg-zinc-50 hover:scale-105 active:scale-95 transition-all">
-      {React.isValidElement(icon) && React.cloneElement(icon, { className: "w-6 h-6" } as any)}
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      onClick={onClick}
+      className="flex items-center justify-center py-4 bg-white border border-zinc-100 rounded-2xl shadow-sm text-zinc-900 hover:bg-zinc-50 hover:scale-105 active:scale-95 transition-all"
+    >
+      {React.isValidElement(icon) && React.cloneElement(icon, { className: 'w-6 h-6 text-zinc-950' } as any)}
     </button>
   );
 }
