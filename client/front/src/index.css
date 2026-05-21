@@ -22,6 +22,27 @@ html {
   scroll-behavior: auto;
 }
 
+/* Lenis smooth scrolling recommended styles */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
 button,
 a {
   -webkit-tap-highlight-color: transparent;
@@ -376,7 +397,6 @@ a {
 
 .hero-dashboard,
 .float-layer,
-.pin-stage,
 .macro-card,
 .dash-panel,
 .feature-card,
@@ -388,6 +408,15 @@ a {
   will-change: width;
 }
 
+.atmosphere,
+.mesh-field,
+.light-field,
+.ambient-particles,
+.cinematic-vignette {
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+
 .dashboard-fade-in {
   animation: dashboardFadeIn 360ms ease-out both;
 }
@@ -397,7 +426,6 @@ a {
     opacity: 0;
     transform: translateY(8px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);

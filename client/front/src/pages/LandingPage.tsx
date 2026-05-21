@@ -83,17 +83,18 @@ export default function LandingPage() {
     if (reduceMotion) return;
 
     const lenis = new Lenis({
-      duration: 1.12,
+      duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
     });
 
-    const raf = (time: number) => {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    };
-    const frame = requestAnimationFrame(raf);
     lenis.on('scroll', ScrollTrigger.update);
+
+    const updatePhysics = (time: number) => {
+      lenis.raf(time * 1000);
+    };
+    gsap.ticker.add(updatePhysics);
+    gsap.ticker.lagSmoothing(0);
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
@@ -111,7 +112,7 @@ export default function LandingPage() {
           trigger: '.landing-hero',
           start: 'top top',
           end: 'bottom top',
-          scrub: 1,
+          scrub: true,
         },
       });
 
@@ -125,7 +126,7 @@ export default function LandingPage() {
           trigger: '.landing-hero',
           start: '20% top',
           end: 'bottom top',
-          scrub: 1,
+          scrub: true,
         },
       });
 
@@ -138,7 +139,7 @@ export default function LandingPage() {
             trigger: '.landing-hero',
             start: 'top top',
             end: 'bottom top',
-            scrub: 1.4,
+            scrub: true,
           },
         });
       });
@@ -147,9 +148,9 @@ export default function LandingPage() {
         ScrollTrigger.create({
           trigger: section,
           start: 'top top',
-          end: '+=82%',
+          end: 'bottom bottom',
           pin: section.querySelector('.pin-stage'),
-          scrub: 1.15,
+          scrub: true,
         });
       });
 
@@ -163,7 +164,7 @@ export default function LandingPage() {
             trigger: '.logging-section',
             start: 'top top',
             end: '35% top',
-            scrub: 1,
+            scrub: true,
           },
         },
       );
@@ -178,7 +179,7 @@ export default function LandingPage() {
             trigger: '.logging-section',
             start: '18% top',
             end: '48% top',
-            scrub: 1,
+            scrub: true,
           },
         },
       );
@@ -196,7 +197,7 @@ export default function LandingPage() {
             trigger: '.logging-section',
             start: '38% top',
             end: '82% top',
-            scrub: 1,
+            scrub: true,
           },
         },
       );
@@ -207,8 +208,8 @@ export default function LandingPage() {
         scrollTrigger: {
           trigger: '.dashboard-section',
           start: 'top top',
-          end: '+=92%',
-          scrub: 1.15,
+          end: 'bottom bottom',
+          scrub: true,
         },
       });
 
@@ -225,7 +226,7 @@ export default function LandingPage() {
             trigger: '.dashboard-section',
             start: 'top 30%',
             end: '70% top',
-            scrub: 1,
+            scrub: true,
           },
         },
       );
@@ -243,7 +244,7 @@ export default function LandingPage() {
               trigger: card,
               start: 'top 96%',
               end: 'top 68%',
-              scrub: 1,
+              scrub: true,
             },
           },
         );
@@ -280,7 +281,7 @@ export default function LandingPage() {
             trigger: '.final-cta',
             start: 'top 55%',
             end: 'top 10%',
-            scrub: 1,
+            scrub: true,
           },
         },
       );
@@ -288,8 +289,8 @@ export default function LandingPage() {
 
     return () => {
       ctx.revert();
+      gsap.ticker.remove(updatePhysics);
       lenis.destroy();
-      cancelAnimationFrame(frame);
     };
   }, []);
 
@@ -509,7 +510,7 @@ function LoggingShowcase() {
 
 function DashboardPreview() {
   return (
-    <section id="dashboard" className="dashboard-section story-pin relative min-h-[195svh] bg-[#050606]">
+    <section id="dashboard" className="dashboard-section story-pin relative min-h-[192svh] bg-[#050606]">
       <div className="pin-stage flex min-h-screen flex-col justify-center overflow-hidden px-5 py-12 md:px-8">
         <Atmosphere intensity="deep" />
         <div className="mx-auto mb-7 w-full max-w-6xl">
