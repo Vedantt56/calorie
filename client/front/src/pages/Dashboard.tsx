@@ -1,47 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { 
-  Home, 
-  Utensils, 
-  Plus, 
-  Activity, 
-  TrendingUp, 
-  Bell, 
-  Search, 
-  Droplet, 
-  Flame, 
-  Scale, 
-  Heart,
-  ChevronLeft,
-  ChevronRight,
-  Pencil,
-  Lock,
-  Loader2,
-  Trash2,
-  Settings,
-  LogOut,
-  Calendar
+import {
+  Home, Utensils, Plus, Activity, TrendingUp, Bell,
+  Droplet, Flame, Scale, Heart, ChevronLeft, ChevronRight,
+  Pencil, Lock, Loader2, Trash2, Settings, LogOut, Calendar, Zap, ChevronDown,
 } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { format, addDays, subDays } from "date-fns";
-
-// Use the generated images (stored in public folder)
-const mealBowlImg = "/assets/img/healthy_meal_bowl.png";
-const ingredientsImg = "/assets/img/fresh_ingredients.png";
-
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import OnboardingModal from "../components/OnboardingModal";
+import { getCurrentMealTime, getMealTimeOfDay, getMealTypeLabel } from "../utils/mealTime";
 
 type FoodLog = {
-  _id?: string;
-  calories?: number;
-  carbs?: number;
-  protein?: number;
-  fat?: number;
-  foodName?: string;
-  quantity?: number;
-  unit?: string;
-  size?: string;
+  _id?: string; calories?: number; carbs?: number;
+  protein?: number; fat?: number; foodName?: string;
+  quantity?: number; unit?: string; size?: string; createdAt?: string;
+};
+
+const T = {
+  bg: "#050506", surface: "rgba(255,255,255,0.03)",
+  surfaceHover: "rgba(255,255,255,0.055)", border: "rgba(255,255,255,0.07)",
+  amber: "#f5b35c", amberLight: "#f4e7d1", text: "#f4f1ea",
+  textSub: "rgba(255,255,255,0.45)", textMuted: "rgba(255,255,255,0.24)",
+  sidebar: "rgba(8,8,10,0.96)",
 };
 
 export default function Dashboard() {
@@ -54,507 +35,734 @@ export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [loadingLogs, setLoadingLogs] = useState(true);
-  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [expandedMeals, setExpandedMeals] = useState<Set<string>>(new Set());
 
-  // Targets from User Profile (Fallbacks if not yet calculated)
   const targets = {
     calories: user?.targetCalories || 2000,
-    carbs: user?.targetCarbs || 250,
-    protein: user?.targetProtein || 150,
-    fat: user?.targetFat || 70,
-    water: 2500,
-    weight: user?.weight || 70
+    carbs:    user?.targetCarbs    || 250,
+    protein:  user?.targetProtein  || 150,
+    fat:      user?.targetFat      || 70,
+    weight:   user?.weight         || 70,
   };
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      navigate('/login');
-    }
-    // Open onboarding if user has no profile stats
-    if (!authLoading && user && !user.height) {
-      setIsOnboardingOpen(true);
-    }
-  }, [user, authLoading, navigate]);
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
-    if (user) {
-      fetchLogs();
-    }
-  }, [currentDate, user]);
+    if (!authLoading && !user) navigate("/login");
+    if (!authLoading && user && !user.height) setIsOnboardingOpen(true);
+  }, [user, authLoading, navigate]);
+
+  useEffect(() => { if (user) fetchLogs(); }, [currentDate, user]);
 
   const fetchLogs = async () => {
     if (!user) return;
     try {
       setLoadingLogs(true);
-      const res = await fetch('/api/food/log', {
-        headers: {
-          'Authorization': `Bearer ${user.token}`
-        }
-      });
-      const contentType = res.headers.get('content-type') || '';
-      if (!res.ok) {
-        const message = await res.text();
-        throw new Error(`Fetch logs failed: ${res.status} ${res.statusText} - ${message}`);
-      }
-      if (!contentType.includes('application/json')) {
-        const text = await res.text();
-        throw new Error(`Expected JSON response, got: ${text}`);
-      }
+      const res = await fetch("/api/food/log", { headers: { Authorization: `Bearer ${user.token}` } });
+      const ct = res.headers.get("content-type") || "";
+      if (!res.ok) throw new Error(await res.text());
+      if (!ct.includes("application/json")) throw new Error("Expected JSON");
       const data = await res.json();
       setLogs(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error(err);
-      setLogs([]);
-    } finally {
-      setLoadingLogs(false);
-    }
+    } catch (err) { console.error(err); setLogs([]); }
+    finally { setLoadingLogs(false); }
   };
 
   const handleSmartLog = async () => {
     if (!inputText.trim() || !user) return;
     setIsLogging(true);
     try {
-      const res = await fetch('/api/food/log-text', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.token}`
-        },
-        body: JSON.stringify({ text: inputText })
+      const res = await fetch("/api/food/log-text", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${user.token}` },
+        body: JSON.stringify({ text: inputText }),
       });
-      const contentType = res.headers.get('content-type') || '';
-      if (!res.ok) {
-        const message = await res.text();
-        throw new Error(`Log meal failed: ${res.status} ${res.statusText} - ${message}`);
-      }
-      if (!contentType.includes('application/json')) {
-        const text = await res.text();
-        throw new Error(`Expected JSON response, got: ${text}`);
-      }
-      setInputText("");
-      setIsModalOpen(false);
-      fetchLogs();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLogging(false);
-    }
+      if (!res.ok) throw new Error(await res.text());
+      setInputText(""); setIsModalOpen(false); fetchLogs();
+    } catch (err) { console.error(err); }
+    finally { setIsLogging(false); }
   };
 
   const handleDeleteLog = async (id: string) => {
     if (!user) return;
     try {
-      const res = await fetch(`/api/food/log/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${user.token}`
-        }
-      });
+      const res = await fetch(`/api/food/log/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${user.token}` } });
       if (!res.ok) throw new Error("Delete failed");
       fetchLogs();
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) { console.error(err); }
   };
 
-  // Aggregates
-  const eatenCalories = Math.round(logs.reduce((acc, log) => acc + (log.calories ?? 0), 0));
-  const eatenCarbs = Number(logs.reduce((acc, log) => acc + (log.carbs ?? 0), 0).toFixed(1));
-  const eatenProtein = Number(logs.reduce((acc, log) => acc + (log.protein ?? 0), 0).toFixed(1));
-  const eatenFat = Number(logs.reduce((acc, log) => acc + (log.fat ?? 0), 0).toFixed(1));
+  const eatenCalories = Math.round(logs.reduce((a, l) => a + (l.calories ?? 0), 0));
+  const eatenCarbs    = +logs.reduce((a, l) => a + (l.carbs    ?? 0), 0).toFixed(1);
+  const eatenProtein  = +logs.reduce((a, l) => a + (l.protein  ?? 0), 0).toFixed(1);
+  const eatenFat      = +logs.reduce((a, l) => a + (l.fat      ?? 0), 0).toFixed(1);
+  const remaining     = Math.max(targets.calories - eatenCalories, 0);
+  const calPct        = Math.min((eatenCalories / targets.calories) * 100, 100);
+
+  // Filter logs to show only meals from current time of day
+  const currentMealTime = getCurrentMealTime();
+  const filteredLogs = logs.filter((log) => {
+    if (!log.createdAt) return true; // Keep logs without createdAt
+    const logTime = getMealTimeOfDay(new Date(log.createdAt).getHours());
+    return logTime === currentMealTime;
+  });
+
+  // Group logs by meal session (within 30 mins of each other)
+  const groupedMeals = React.useMemo(() => {
+    const groups: Array<{ id: string; time: Date; items: FoodLog[]; totalCalories: number; totalCarbs: number; totalProtein: number; totalFat: number }> = [];
+    const sortedLogs = [...filteredLogs].sort((a, b) => {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return timeB - timeA;
+    });
+
+    for (const log of sortedLogs) {
+      const logTime = log.createdAt ? new Date(log.createdAt) : new Date();
+      const lastGroup = groups[groups.length - 1];
+
+      if (lastGroup && Math.abs(logTime.getTime() - lastGroup.time.getTime()) < 30 * 60 * 1000) {
+        lastGroup.items.push(log);
+        lastGroup.totalCalories += log.calories || 0;
+        lastGroup.totalCarbs += log.carbs || 0;
+        lastGroup.totalProtein += log.protein || 0;
+        lastGroup.totalFat += log.fat || 0;
+      } else {
+        groups.push({
+          id: `meal-${groups.length + 1}-${logTime.getTime()}`,
+          time: logTime,
+          items: [log],
+          totalCalories: log.calories || 0,
+          totalCarbs: log.carbs || 0,
+          totalProtein: log.protein || 0,
+          totalFat: log.fat || 0,
+        });
+      }
+    }
+
+    return groups;
+  }, [filteredLogs]);
+
+  const toggleMealExpanded = (mealId: string) => {
+    setExpandedMeals((prev) => {
+      const newSet = new Set(prev);
+      newSet.has(mealId) ? newSet.delete(mealId) : newSet.add(mealId);
+      return newSet;
+    });
+  };
 
   return (
-    <div className="dashboard-scale dashboard-fade-in min-h-screen bg-[#f8f9fd] font-sans pb-24 md:pb-0 md:pl-18 text-zinc-800 transition-all duration-300">
-      
-      {/* Desktop Sidebar (Hover-to-Expand) */}
-      <aside 
-        onMouseEnter={() => setIsSidebarExpanded(true)}
-        onMouseLeave={() => setIsSidebarExpanded(false)}
-        className={`hidden md:flex flex-col items-start justify-between bg-[#1c1c1e] fixed left-0 top-0 bottom-0 py-8 rounded-r-[2.5rem] text-zinc-400 transition-all duration-300 ease-in-out z-[100] overflow-hidden shadow-2xl ${
-          isSidebarExpanded ? 'w-64 px-2' : 'w-20 px-0 items-center'
-        }`}
+    <div className="dash-root">
+
+      {/* ── MOBILE OVERLAY ── */}
+      {isMobile && sidebarOpen && (
+        <div onClick={() => setSidebarOpen(false)}
+          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", zIndex: 90 }} />
+      )}
+
+      {/* ── SIDEBAR ── */}
+      <aside className={`dash-sidebar ${sidebarOpen ? "sidebar-open" : ""}`}
+        onMouseEnter={() => !isMobile && setSidebarOpen(true)}
+        onMouseLeave={() => !isMobile && setSidebarOpen(false)}
       >
-        <div className={`flex items-center gap-4 transition-all duration-300 ${isSidebarExpanded ? 'w-full px-4' : 'px-0'}`}>
-           <div className="w-10 h-10 bg-[#adff00] rounded-xl flex items-center justify-center font-bold text-black text-xl shrink-0">
-            N
+        {/* Logo */}
+        <div className="sidebar-logo">
+          <div className="logo-icon">
+            <Flame style={{ width: "18px", height: "18px", color: "#000" }} />
           </div>
-          <span className={`font-bold text-white text-xl transition-all duration-300 whitespace-nowrap ${isSidebarExpanded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 w-0 pointer-events-none'}`}>
-            NutriFlow
-          </span>
+          <span className={`logo-text ${sidebarOpen ? "visible" : ""}`}>CalTrack</span>
         </div>
 
-        <nav className="flex flex-col gap-2 w-full">
-          <NavItem icon={<Home />} label="Dashboard" active expanded={isSidebarExpanded} />
-          <NavItem icon={<Utensils />} label="My Meals" expanded={isSidebarExpanded} />
-          <NavItem icon={<Activity />} label="Health Stats" expanded={isSidebarExpanded} />
-          <NavItem icon={<TrendingUp />} label="Progress" expanded={isSidebarExpanded} />
-          <NavItem icon={<Calendar />} label="History" expanded={isSidebarExpanded} />
-          <div className="h-px bg-zinc-800 my-4 mx-3" />
-          <NavItem icon={<Settings />} label="Settings" expanded={isSidebarExpanded} />
+        {/* Nav */}
+        <nav className="sidebar-nav">
+          <SideNavItem icon={<Home />}       label="Dashboard"   active expanded={sidebarOpen} onClick={() => navigate("/dashboard")} />
+          <SideNavItem icon={<Utensils />}   label="My Meals"    expanded={sidebarOpen} onClick={() => navigate("/my-meals")} />
+          <SideNavItem icon={<Activity />}   label="Health"      expanded={sidebarOpen} />
+          <SideNavItem icon={<TrendingUp />} label="Progress"    expanded={sidebarOpen} onClick={() => navigate("/progress")} />
+          <SideNavItem icon={<Calendar />}   label="History"     expanded={sidebarOpen} />
+          <div className="sidebar-divider" />
+          <SideNavItem icon={<Settings />}   label="Settings"    expanded={sidebarOpen} />
         </nav>
 
-        <div className={`mt-auto flex items-center gap-4 w-full transition-all duration-300 ${isSidebarExpanded ? 'px-4' : ''}`}>
-          <div className="w-10 h-10 rounded-full bg-zinc-700 border-2 border-zinc-600 overflow-hidden shrink-0">
-            <img src="https://picsum.photos/seed/user/100/100" alt="User" referrerPolicy="no-referrer" />
+        {/* User */}
+        <div className="sidebar-user">
+          <div className="user-avatar">
+            {(user?.name || "G")[0].toUpperCase()}
           </div>
-          <div className={`flex flex-col transition-all duration-300 whitespace-nowrap ${isSidebarExpanded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 w-0 pointer-events-none'}`}>
-            <span className="text-white font-semibold text-sm leading-tight">{user?.name || 'Guest'}</span>
-            <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-wider">Premium</span>
+          <div className={`user-info ${sidebarOpen ? "visible" : ""}`}>
+            <p className="user-name">{user?.name || "Guest"}</p>
+            <p className="user-plan">Premium</p>
           </div>
-          {isSidebarExpanded && <LogOut className="w-4 h-4 ml-auto hover:text-white cursor-pointer transition-colors" onClick={logout} />}
+          {sidebarOpen && (
+            <LogOut onClick={logout} style={{ width: "15px", height: "15px", color: T.textMuted, cursor: "pointer", flexShrink: 0, marginLeft: "auto" }} />
+          )}
         </div>
       </aside>
 
-      <main className="max-w-[1500px] mx-auto p-4 md:p-7 lg:p-8">
+      {/* ── MAIN ── */}
+      <main className="dash-main">
+
         {/* Header */}
-        <header className="flex justify-between items-center mb-7">
-          <div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-zinc-900 mb-1">Welcome back, {user?.name?.split(' ')[0] || 'Guest'}! 👋</h1>
-            <p className="text-zinc-500 font-medium">Your nutrition summary for today is looking great.</p>
+        <header className="dash-header">
+          <div className="header-left">
+            {/* Mobile menu button */}
+            {isMobile && (
+              <button onClick={() => setSidebarOpen(true)} className="mobile-menu-btn">
+                <div style={{ width: "18px", display: "flex", flexDirection: "column", gap: "4px" }}>
+                  {[0,1,2].map(i => <div key={i} style={{ height: "2px", background: T.textSub, borderRadius: "2px" }} />)}
+                </div>
+              </button>
+            )}
+            <div>
+              <h1 className="header-title">Welcome back, {user?.name?.split(" ")[0] || "Guest"} 👋</h1>
+              <p className="header-sub">Here's your nutrition overview for today.</p>
+            </div>
           </div>
-          <div className="flex gap-4 items-center">
-            <div className="hidden md:flex gap-2 items-center bg-white px-4 py-2 rounded-2xl shadow-sm border border-zinc-100">
-              <Calendar className="w-4 h-4 text-[#8e85fd]" />
-              <span className="text-sm font-bold text-zinc-600">{format(currentDate, "EEE, MMM do")}</span>
+          <div className="header-right">
+            <div className="date-pill">
+              <Calendar style={{ width: "13px", height: "13px", color: T.amber }} />
+              <span>{format(currentDate, "EEE, MMM do")}</span>
             </div>
-            <div className="flex gap-2">
-              <button className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-sm border border-zinc-50 hover:bg-zinc-50 transition-colors">
-                <Search className="w-5 h-5 text-zinc-600" />
-              </button>
-              <button className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center shadow-sm relative border border-zinc-50 hover:bg-zinc-50 transition-colors">
-                <Bell className="w-5 h-5 text-zinc-600" />
-                <span className="w-2.5 h-2.5 bg-red-500 rounded-full absolute top-3.5 right-3.5 border-2 border-white"></span>
-              </button>
-            </div>
+            <button className="icon-btn" style={{ position: "relative" }}>
+              <Bell style={{ width: "15px", height: "15px", color: T.textSub }} />
+              <span className="notif-dot" />
+            </button>
           </div>
         </header>
 
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-          
-          {/* Main Dashboard Area (Left/Middle) */}
-          <div className="xl:col-span-8 space-y-6">
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {/* Body Overview Card */}
-              <div className="bg-[#1c1c1e] text-white rounded-[2rem] p-6 shadow-2xl relative overflow-hidden h-full flex flex-col justify-between">
+        {/* ── CONTENT GRID ── */}
+        <div className="dash-grid">
+
+          {/* LEFT: Calorie Card */}
+          <div className="card calorie-card">
+            <div className="card-glow" />
+            <div className="card-dots" />
+            <div style={{ position: "relative", zIndex: 1 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.25rem" }}>
                 <div>
-                   <div className="flex justify-between items-start mb-6">
-                     <div>
-                       <h2 className="text-xl font-bold tracking-tight text-zinc-100">Body Overview</h2>
-                       <p className="text-sm text-zinc-400 mt-1">Keep crushing your macro goals!</p>
-                     </div>
-                     <button className="bg-zinc-800 p-2 border border-zinc-700 rounded-xl hover:bg-zinc-700 transition-colors text-zinc-400 hover:text-white">
-                       <Pencil className="w-4 h-4" />
-                     </button>
-                   </div>
-                   
-                   <div className="text-center my-8">
-                     <div className="text-5xl font-black font-mono tracking-tighter text-white mb-2">{Math.max(targets.calories - eatenCalories, 0)}</div>
-                     <div className="text-zinc-400 font-bold tracking-widest text-xs uppercase">Calories Remaining</div>
-                   </div>
+                  <h2 style={{ fontSize: "14px", fontWeight: 600, color: T.text, margin: "0 0 3px" }}>Calorie Overview</h2>
+                  <p style={{ fontSize: "11px", color: T.textMuted, margin: 0 }}>Daily target progress</p>
                 </div>
-
-                <div className="flex justify-between items-center px-2">
-                  <MacroRing label="Protein" eaten={eatenProtein} target={targets.protein} color="#f97316" />
-                  <MacroRing label="Carbs" eaten={eatenCarbs} target={targets.carbs} color="#84cc16" />
-                  <MacroRing label="Fat" eaten={eatenFat} target={targets.fat} color="#0ea5e9" />
-                </div>
+                <button className="icon-btn">
+                  <Pencil style={{ width: "13px", height: "13px", color: T.textSub }} />
+                </button>
               </div>
 
-              {/* Inspiration Card with Image */}
-              <div className="bg-white rounded-[2rem] shadow-sm border border-zinc-100 overflow-hidden relative group h-full flex flex-col">
-                <img src={mealBowlImg} className="w-full h-40 object-cover transition-transform duration-700 group-hover:scale-110" alt="Healthy Meal" />
-                <div className="p-6">
-                  <span className="text-[10px] font-bold text-[#8e85fd] uppercase tracking-[0.2em] mb-2 block">Daily Inspiration</span>
-                  <h3 className="text-xl font-extrabold text-zinc-900 leading-tight mb-3">Harvest Power Bowl with Quinoa</h3>
-                  <p className="text-zinc-500 text-sm leading-relaxed mb-4">High in fiber and Omega-3s. Perfect for sustained energy throughout your afternoon.</p>
-                  <button className="text-sm font-bold text-zinc-900 flex items-center gap-2 group/btn">
-                    View Recipe <ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
-                  </button>
+              <div style={{ textAlign: "center", marginBottom: "1.25rem" }}>
+                <div style={{ fontSize: "56px", fontWeight: 800, color: T.amberLight, letterSpacing: "-0.03em", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{remaining}</div>
+                <div style={{ fontSize: "10px", fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: T.textMuted, marginTop: "6px" }}>kcal remaining</div>
+              </div>
+
+              {/* Progress bar */}
+              <div style={{ marginBottom: "1.5rem" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "7px" }}>
+                  <span style={{ fontSize: "11px", color: T.textMuted }}>{eatenCalories} eaten</span>
+                  <span style={{ fontSize: "11px", color: T.textMuted }}>{targets.calories} goal</span>
+                </div>
+                <div style={{ height: "6px", background: "rgba(255,255,255,0.06)", borderRadius: "99px", overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${calPct}%`, background: `linear-gradient(90deg, ${T.amber}, #f4e7d1)`, borderRadius: "99px", transition: "width 0.8s ease" }} />
                 </div>
               </div>
-            </div>
 
-            {/* Daily Target Grid */}
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="font-bold text-xl tracking-tight text-zinc-900">Health Matrix</h3>
-                <button className="text-[#8e85fd] text-sm font-bold hover:underline">View Analytics</button>
+              {/* Macro rings */}
+              <div style={{ display: "flex", justifyContent: "space-around" }}>
+                <MacroRing label="Protein" eaten={eatenProtein} target={targets.protein} color="#f97316" />
+                <MacroRing label="Carbs"   eaten={eatenCarbs}   target={targets.carbs}   color={T.amber} />
+                <MacroRing label="Fat"     eaten={eatenFat}     target={targets.fat}     color="#69b8cc" />
               </div>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard icon={<Droplet fill="#3b82f6" className="text-blue-500 w-5 h-5" />} title="Water Intake" value="1200 ml" subtitle="Target 2500 ml" color="blue" />
-                <StatCard icon={<Flame fill="#f97316" className="text-orange-500 w-5 h-5" />} title="Calories Eaten" value={`${eatenCalories} kcal`} subtitle="Consumed Today" color="orange" />
-                <StatCard icon={<Scale fill="#ec4899" className="text-pink-500 w-5 h-5" />} title="Body Weight" value={`${targets.weight} Kg`} subtitle="Stable Trend" color="pink" />
-                <StatCard icon={<Heart fill="#ef4444" className="text-red-500 w-5 h-5" />} title="Heart Rate" value="72 BPM" subtitle="Normal Range" color="red" />
-              </div>
-            </div>
-
-            {/* Feature Gallery */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-               <div className="bg-[#cdff7f] rounded-[1.75rem] p-6 relative overflow-hidden h-48 flex flex-col justify-end transition-all hover:translate-y-[-4px] cursor-pointer shadow-sm">
-                  <div className="absolute top-6 left-6 bg-white/40 backdrop-blur-md p-3 rounded-2xl">
-                    <Droplet className="w-6 h-6 text-lime-900" />
-                  </div>
-                  <h4 className="font-extrabold text-xl z-10 leading-tight text-lime-950">Water<br/>Tracker</h4>
-                  <p className="text-sm font-bold text-lime-900/60 z-10 mt-1 uppercase tracking-wider">Stay Refreshed</p>
-                  <img src="https://picsum.photos/seed/water/300/300" className="absolute top-0 right-0 opacity-20 object-cover w-full h-full mix-blend-multiply" alt="" />
-               </div>
-
-               <div className="bg-zinc-900 text-white rounded-[1.75rem] p-6 relative overflow-hidden h-48 flex flex-col justify-end transition-all hover:translate-y-[-4px] cursor-pointer shadow-lg group">
-                  <div className="absolute top-6 right-6 bg-zinc-800/80 p-3 rounded-2xl backdrop-blur-md border border-zinc-700 z-20">
-                    <Lock className="w-5 h-5 text-amber-400" />
-                  </div>
-                  <h4 className="font-extrabold text-xl z-10 leading-tight">Meal<br/>Prepper</h4>
-                  <p className="text-sm font-bold text-zinc-500 z-10 mt-1 uppercase tracking-wider">Pro Feature</p>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-10"></div>
-                  <img src={ingredientsImg} className="absolute inset-0 object-cover w-full h-full opacity-40 group-hover:scale-105 transition-transform duration-700" alt="" />
-               </div>
-
-               <div className="bg-[#8e85fd] text-white rounded-[1.75rem] p-6 relative overflow-hidden h-48 flex flex-col justify-end transition-all hover:translate-y-[-4px] cursor-pointer shadow-sm group">
-                  <div className="absolute top-6 left-6 bg-white/20 backdrop-blur-md p-3 rounded-2xl">
-                    <Activity className="w-6 h-6 text-white" />
-                  </div>
-                  <h4 className="font-extrabold text-xl z-10 leading-tight">Activity<br/>Insights</h4>
-                  <p className="text-sm font-bold text-white/60 z-10 mt-1 uppercase tracking-wider">Burn More</p>
-                  <img src="https://picsum.photos/seed/fitness/300/300" className="absolute top-0 right-0 opacity-20 object-cover w-full h-full mix-blend-overlay group-hover:rotate-3 transition-transform duration-700" alt="" />
-               </div>
             </div>
           </div>
 
-          {/* Right Panel (Meals & Progress Monitor) */}
-          <div className="xl:col-span-4 space-y-8">
-            
-            {/* Today's Meals Panel */}
-            <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-zinc-100 flex flex-col h-full sticky top-8">
-               <div className="flex justify-between items-center mb-8">
-                 <h3 className="font-bold text-xl tracking-tight text-zinc-900">Today's Meals</h3>
-                 <div className="flex gap-2">
-                    <button onClick={() => setCurrentDate(subDays(currentDate, 1))} className="p-2 bg-zinc-50 rounded-lg hover:bg-zinc-100 transition-colors">
-                      <ChevronLeft className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => setCurrentDate(addDays(currentDate, 1))} className="p-2 bg-zinc-50 rounded-lg hover:bg-zinc-100 transition-colors">
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                 </div>
-               </div>
-               
-               <div className="bg-[#f8f9fc] rounded-[2rem] p-6 mb-8 border border-zinc-50">
-                 <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-4 text-center">Macro distribution</p>
-                 <div className="flex gap-3">
-                   <div className="flex-1 bg-white p-3 rounded-2xl flex flex-col items-center border border-zinc-50 shadow-sm">
-                     <span className="text-[10px] uppercase font-bold text-green-600 mb-1">Carbs</span>
-                     <span className="text-sm font-extrabold text-zinc-800">{eatenCarbs}g</span>
-                   </div>
-                   <div className="flex-1 bg-white p-3 rounded-2xl flex flex-col items-center border border-zinc-50 shadow-sm">
-                     <span className="text-[10px] uppercase font-bold text-orange-600 mb-1">Prot</span>
-                     <span className="text-sm font-extrabold text-zinc-800">{eatenProtein}g</span>
-                   </div>
-                   <div className="flex-1 bg-white p-3 rounded-2xl flex flex-col items-center border border-zinc-50 shadow-sm">
-                     <span className="text-[10px] uppercase font-bold text-blue-600 mb-1">Fats</span>
-                     <span className="text-sm font-extrabold text-zinc-800">{eatenFat}g</span>
-                   </div>
-                 </div>
-               </div>
+          {/* MIDDLE: Stat cards 2x2 */}
+          <div className="stats-grid">
+            <StatCard icon={<Droplet />} title="Water"     value="1200 ml"           sub="Goal: 2500 ml"  iconColor="#69b8cc" />
+            <StatCard icon={<Flame />}   title="Burned"    value={`${eatenCalories}`} sub="kcal today"    iconColor="#f97316" />
+            <StatCard icon={<Scale />}   title="Weight"    value={`${targets.weight} kg`} sub="Stable"   iconColor={T.amber} />
+            <StatCard icon={<Heart />}   title="Heart"     value="72 BPM"            sub="Normal range"   iconColor="#ef4444" />
+          </div>
 
-               <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                 {loadingLogs ? (
-                    <div className="flex justify-center p-12">
-                      <Loader2 className="w-10 h-10 animate-spin text-[#8e85fd]" />
-                    </div>
-                 ) : logs.length === 0 ? (
-                    <div className="text-center p-10 text-zinc-400 bg-zinc-50 rounded-[2rem] border border-dashed border-zinc-200">
-                      <Utensils className="w-8 h-8 mx-auto mb-3 opacity-20" />
-                      <p className="font-medium">No meals logged yet.</p>
-                      <p className="text-xs">Start by adding your first meal!</p>
-                    </div>
-                 ) : (
-                   logs.map((log, i) => (
-                      <div key={log._id || i} className="flex items-center justify-between p-4 bg-white border border-zinc-100 rounded-[1.5rem] shadow-sm hover:shadow-md transition-all group relative overflow-hidden">
-                        <div className="flex items-center gap-4">
-                          <div className="w-14 h-14 bg-[#f8f9fc] rounded-2xl overflow-hidden flex items-center justify-center shrink-0 group-hover:bg-[#8e85fd]/10 transition-colors">
-                            <Utensils className="w-6 h-6 text-zinc-400 group-hover:text-[#8e85fd] transition-colors" />
+          {/* RIGHT: Today's Meals */}
+          <div className="meals-panel">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+              <div>
+                <h3 style={{ fontSize: "14px", fontWeight: 600, color: T.text, margin: "0 0 2px" }}>Today's Meals</h3>
+                <p style={{ fontSize: "10px", color: T.textMuted, margin: 0 }}>{getMealTypeLabel(currentMealTime)} · View all in My Meals</p>
+              </div>
+              <div style={{ display: "flex", gap: "6px" }}>
+                <button onClick={() => setCurrentDate(subDays(currentDate, 1))} className="icon-btn">
+                  <ChevronLeft style={{ width: "13px", height: "13px", color: T.textSub }} />
+                </button>
+                <button onClick={() => setCurrentDate(addDays(currentDate, 1))} className="icon-btn">
+                  <ChevronRight style={{ width: "13px", height: "13px", color: T.textSub }} />
+                </button>
+              </div>
+            </div>
+
+            {/* Macro pills */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: "1rem" }}>
+              {[
+                { label: "Carbs",   val: `${eatenCarbs}g`,   color: T.amber },
+                { label: "Protein", val: `${eatenProtein}g`, color: "#f97316" },
+                { label: "Fat",     val: `${eatenFat}g`,     color: "#69b8cc" },
+              ].map(m => (
+                <div key={m.label} style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: "12px", padding: "10px 6px", textAlign: "center" }}>
+                  <div style={{ fontSize: "14px", fontWeight: 700, color: m.color }}>{m.val}</div>
+                  <div style={{ fontSize: "9px", fontWeight: 600, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", marginTop: "2px" }}>{m.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Log list */}
+            <div className="log-list">
+              {loadingLogs ? (
+                <div style={{ display: "flex", justifyContent: "center", padding: "2.5rem 0" }}>
+                  <Loader2 style={{ width: "24px", height: "24px", color: T.amber, animation: "spin 1s linear infinite" }} />
+                </div>
+              ) : filteredLogs.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "2rem 1rem", color: T.textMuted, background: T.surface, borderRadius: "16px", border: `1px dashed ${T.border}` }}>
+                  <Utensils style={{ width: "22px", height: "22px", margin: "0 auto 8px", opacity: 0.3 }} />
+                  <p style={{ fontSize: "13px", fontWeight: 500, margin: "0 0 3px" }}>No {getMealTypeLabel(currentMealTime).toLowerCase()} meals yet.</p>
+                  <p style={{ fontSize: "11px", margin: 0 }}>Add your first meal below!</p>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  {groupedMeals.map((mealGroup) => {
+                    const isExpanded = expandedMeals.has(mealGroup.id);
+                    return (
+                      <div key={mealGroup.id}>
+                        <div
+                          onClick={() => toggleMealExpanded(mealGroup.id)}
+                          className="log-item"
+                          style={{
+                            background: T.surface,
+                            border: `1px solid ${T.border}`,
+                            borderRadius: isExpanded ? "13px 13px 0 0" : "13px",
+                            cursor: "pointer",
+                          }}
+                          onMouseOver={e => { (e.currentTarget as HTMLElement).style.background = T.surfaceHover; }}
+                          onMouseOut={e => { (e.currentTarget as HTMLElement).style.background = T.surface; }}
+                        >
+                          <ChevronDown
+                            style={{
+                              width: "14px",
+                              height: "14px",
+                              color: T.textSub,
+                              flexShrink: 0,
+                              transition: "transform 0.2s",
+                              transform: isExpanded ? "rotate(0deg)" : "rotate(-90deg)",
+                              marginRight: "4px",
+                            }}
+                          />
+                          <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0, flex: 1 }}>
+                            <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "rgba(245,179,92,0.1)", border: "1px solid rgba(245,179,92,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                              <Utensils style={{ width: "13px", height: "13px", color: T.amber }} />
+                            </div>
+                            <div style={{ minWidth: 0, flex: 1 }}>
+                              <p style={{ fontSize: "12px", fontWeight: 600, color: T.text, margin: "0 0 2px" }}>Meal</p>
+                              <p style={{ fontSize: "9px", color: T.textMuted, margin: 0 }}>{mealGroup.items.length} item{mealGroup.items.length !== 1 ? "s" : ""}</p>
+                            </div>
                           </div>
-                          <div>
-                            <h4 className="font-bold text-zinc-900 capitalize text-base">{log.foodName}</h4>
-                            <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider">{log.quantity} {log.unit} {log.size ? `• ${log.size}` : ""}</p>
+                          <div style={{ textAlign: "right", flexShrink: 0, paddingRight: "4px" }}>
+                            <div style={{ fontSize: "12px", fontWeight: 700, color: T.amberLight }}>{Math.round(mealGroup.totalCalories)}</div>
+                            <div style={{ fontSize: "8px", color: T.textMuted, fontWeight: 600, textTransform: "uppercase" }}>kcal</div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-4">
-                          <div className="text-right">
-                            <div className="text-lg font-black text-zinc-900 leading-none">{log.calories}</div>
-                            <div className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Kcal</div>
+
+                        {isExpanded && (
+                          <div style={{ background: "rgba(255,255,255,0.015)", border: `1px solid ${T.border}`, borderTop: "none", borderRadius: "0 0 13px 13px", overflow: "hidden" }}>
+                            {mealGroup.items.map((item, idx) => (
+                              <div
+                                key={item._id || idx}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "8px",
+                                  padding: "8px 10px",
+                                  borderTop: idx > 0 ? `1px solid ${T.border}` : "none",
+                                }}
+                              >
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px", minWidth: 0, flex: 1 }}>
+                                  <div style={{ width: "28px", height: "28px", borderRadius: "6px", background: "rgba(245,179,92,0.08)", border: "1px solid rgba(245,179,92,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                    <Utensils style={{ width: "11px", height: "11px", color: T.amber }} />
+                                  </div>
+                                  <div style={{ minWidth: 0, flex: 1 }}>
+                                    <p style={{ fontSize: "11px", fontWeight: 600, color: T.text, margin: "0 0 1px", textTransform: "capitalize", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.foodName}</p>
+                                    <p style={{ fontSize: "9px", color: T.textMuted, margin: 0 }}>{item.quantity} {item.unit}</p>
+                                  </div>
+                                </div>
+                                <div style={{ textAlign: "right", flexShrink: 0 }}>
+                                  <div style={{ fontSize: "11px", fontWeight: 700, color: T.amberLight }}>{item.calories}</div>
+                                  <div style={{ fontSize: "8px", color: T.textMuted, fontWeight: 600 }}>kcal</div>
+                                </div>
+                                <button className="del-btn" onClick={(e) => { e.stopPropagation(); item._id && handleDeleteLog(item._id); }}
+                                  style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: "5px", padding: "4px", cursor: "pointer", display: "flex", flexShrink: 0 }}>
+                                  <Trash2 style={{ width: "10px", height: "10px", color: "#ef4444" }} />
+                                </button>
+                              </div>
+                            ))}
+                            <div style={{ padding: "8px 10px", background: "rgba(255,255,255,0.02)", borderTop: `1px solid ${T.border}`, display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "4px", fontSize: "9px" }}>
+                              <div style={{ textAlign: "center" }}>
+                                <div style={{ fontWeight: 700, color: T.amberLight }}>{mealGroup.totalCarbs.toFixed(0)}g</div>
+                                <div style={{ color: T.textMuted, textTransform: "uppercase", marginTop: "1px" }}>Carbs</div>
+                              </div>
+                              <div style={{ textAlign: "center" }}>
+                                <div style={{ fontWeight: 700, color: "#f97316" }}>{mealGroup.totalProtein.toFixed(0)}g</div>
+                                <div style={{ color: T.textMuted, textTransform: "uppercase", marginTop: "1px" }}>Protein</div>
+                              </div>
+                              <div style={{ textAlign: "center" }}>
+                                <div style={{ fontWeight: 700, color: "#69b8cc" }}>{mealGroup.totalFat.toFixed(0)}g</div>
+                                <div style={{ color: T.textMuted, textTransform: "uppercase", marginTop: "1px" }}>Fat</div>
+                              </div>
+                            </div>
                           </div>
-                          <button 
-                            onClick={() => log._id && handleDeleteLog(log._id)}
-                            className="p-2.5 text-zinc-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100 absolute right-2 bg-white/90 backdrop-blur-sm shadow-sm"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
+                        )}
                       </div>
-                    ))
-                 )}
-               </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
 
-               <button 
-                 onClick={() => setIsModalOpen(true)}
-                 className="mt-8 w-full bg-[#1c1c1e] text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-black transition-all shadow-xl hover:shadow-[#8e85fd]/20"
-               >
-                 <Plus className="w-5 h-5" />
-                 Log New Meal
-               </button>
+            <button onClick={() => setIsModalOpen(true)} className="log-btn">
+              <Plus style={{ width: "16px", height: "16px" }} />
+              Log New Meal
+            </button>
+          </div>
+
+          {/* BOTTOM: Quick Actions */}
+          <div className="quick-actions">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+              <h3 style={{ fontSize: "14px", fontWeight: 600, color: T.text, margin: 0 }}>Quick Actions</h3>
+              <button style={{ fontSize: "11px", color: T.amber, background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>View All</button>
+            </div>
+            <div className="action-cards">
+              <ActionCard color="#69b8cc" icon={<Droplet />} title="Water Tracker"    sub="Stay Refreshed" />
+              <ActionCard color={T.amber}  icon={<Utensils />} title="Meal Prepper"   sub="Pro Feature" locked />
+              <ActionCard color="#f97316" icon={<Activity />} title="Activity Insights" sub="Burn More" />
             </div>
           </div>
 
         </div>
       </main>
 
-      {/* Floating Action Button (Only visible on scroll or mobile) */}
-      <div className="fixed md:bottom-12 md:right-12 bottom-8 left-1/2 md:left-auto transform -translate-x-1/2 md:translate-x-0 z-[60]">
-        <Dialog.Root open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <Dialog.Root>
-             <Dialog.Trigger asChild>
-                <button className="bg-[#adff00] hover:bg-[#99e600] text-black p-5 rounded-[2rem] shadow-2xl hover:scale-105 active:scale-95 transition-all md:hidden">
-                  <Plus className="w-8 h-8" />
-                </button>
-             </Dialog.Trigger>
-          </Dialog.Root>
+      {/* ── MOBILE BOTTOM NAV ── */}
+      {isMobile && (
+        <nav className="mobile-nav">
+          {[
+            { icon: <Home />,       label: "Home",     active: true },
+            { icon: <Utensils />,   label: "Meals" },
+            { icon: <Activity />,   label: "Stats" },
+            { icon: <TrendingUp />, label: "Progress" },
+            { icon: <Settings />,  label: "Settings" },
+          ].map(item => (
+            <button key={item.label} className={`mobile-nav-btn ${item.active ? "active" : ""}`}>
+              {React.isValidElement(item.icon) && React.cloneElement(item.icon as React.ReactElement<any>, { style: { width: "20px", height: "20px" } })}
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </nav>
+      )}
 
-          <Dialog.Portal>
-            <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
-            <Dialog.Content className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-10 rounded-[3rem] shadow-2xl z-[101] w-[95vw] max-w-lg border border-zinc-100 focus:outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]">
-              <div className="flex flex-col items-center text-center mb-8">
-                <div className="w-16 h-16 bg-[#adff00] rounded-3xl flex items-center justify-center mb-4 shadow-lg">
-                  <Flame className="w-8 h-8 text-black" />
+      {/* ── MOBILE FAB ── */}
+      {isMobile && (
+        <button onClick={() => setIsModalOpen(true)} className="mobile-fab">
+          <Plus style={{ width: "22px", height: "22px" }} />
+        </button>
+      )}
+
+      {/* ── LOG MODAL ── */}
+      <Dialog.Root open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(12px)", zIndex: 100 }} />
+          <Dialog.Content className="log-modal">
+            <div className="modal-glow" />
+            <div className="modal-dots" />
+            <div style={{ position: "relative", zIndex: 1 }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", marginBottom: "1.75rem" }}>
+                <div style={{ width: "52px", height: "52px", borderRadius: "16px", background: "rgba(245,235,185,0.9)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1rem", border: "1px solid rgba(245,179,92,0.25)", boxShadow: "0 8px 32px rgba(245,196,123,0.25)" }}>
+                  <Zap style={{ width: "22px", height: "22px", color: "#000" }} />
                 </div>
-                <Dialog.Title className="text-3xl font-black mb-2 tracking-tight text-zinc-900">AI Intelligent Logger</Dialog.Title>
-                <Dialog.Description className="text-zinc-500 font-medium">
-                  Just describe your meal naturally. <br/>
-                  <span className="italic text-zinc-400 text-sm">"I had a large katori of yellow dal and 2 rotis"</span>
+                <Dialog.Title style={{ fontSize: "20px", fontWeight: 700, color: T.text, margin: "0 0 6px", letterSpacing: "-0.01em" }}>AI Food Logger</Dialog.Title>
+                <Dialog.Description style={{ fontSize: "13px", color: T.textSub, margin: 0, lineHeight: 1.6 }}>
+                  Describe your meal naturally.<br />
+                  <span style={{ fontStyle: "italic", color: T.textMuted, fontSize: "12px" }}>"I had a large katori of dal and 2 rotis"</span>
                 </Dialog.Description>
               </div>
-              
-              <div className="relative group">
-                <textarea
-                  autoFocus
-                  className="w-full bg-zinc-50 border-2 border-zinc-100 rounded-[2rem] p-6 min-h-[160px] focus:outline-none focus:ring-4 focus:ring-[#adff00]/20 focus:border-[#adff00] transition-all resize-none text-zinc-800 text-lg placeholder-zinc-300 shadow-inner"
-                  placeholder="Describe your meal here..."
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                />
-                <div className="absolute bottom-4 right-6 text-[10px] font-bold text-zinc-400 uppercase tracking-widest pointer-events-none">
-                  AI Powered Search
-                </div>
-              </div>
-
-              <div className="flex gap-4 mt-8">
+              <textarea autoFocus placeholder="Describe your meal here..." value={inputText} onChange={e => setInputText(e.target.value)}
+                style={{ width: "100%", minHeight: "120px", background: T.surface, border: `1px solid ${T.border}`, borderRadius: "16px", padding: "1rem 1.25rem", fontSize: "14px", color: T.text, outline: "none", resize: "none", fontFamily: "Inter, sans-serif", lineHeight: 1.6, boxSizing: "border-box", transition: "border-color 0.2s" }}
+                onFocus={e => e.target.style.borderColor = "rgba(245,179,92,0.3)"}
+                onBlur={e => e.target.style.borderColor = T.border}
+              />
+              <p style={{ fontSize: "10px", fontWeight: 600, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "right", margin: "6px 0 1.25rem" }}>AI Powered</p>
+              <div style={{ display: "flex", gap: "10px" }}>
                 <Dialog.Close asChild>
-                  <button className="flex-1 py-4 rounded-2xl font-bold text-zinc-500 hover:bg-zinc-100 transition-all">
-                    Discard
-                  </button>
+                  <button style={{ flex: 1, padding: "13px", borderRadius: "14px", background: T.surface, border: `1px solid ${T.border}`, fontSize: "13px", fontWeight: 600, color: T.textSub, cursor: "pointer" }}>Cancel</button>
                 </Dialog.Close>
-                <button 
-                  onClick={handleSmartLog}
-                  disabled={isLogging || !inputText.trim()}
-                  className="flex-[2] bg-[#1c1c1e] text-white py-4 rounded-2xl font-extrabold flex items-center justify-center gap-3 hover:bg-black transition-all disabled:opacity-50 shadow-xl shadow-zinc-200"
-                >
-                  {isLogging ? <Loader2 className="w-6 h-6 animate-spin" /> : <Plus className="w-6 h-6 text-[#adff00]" />}
-                  {isLogging ? 'Processing...' : 'Add to Diary'}
+                <button onClick={handleSmartLog} disabled={isLogging || !inputText.trim()}
+                  style={{ flex: 2, padding: "13px", borderRadius: "14px", background: T.amberLight, border: "none", fontSize: "13px", fontWeight: 700, color: "#000", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", opacity: isLogging || !inputText.trim() ? 0.5 : 1, boxShadow: "0 8px 24px rgba(245,179,92,0.2)" }}>
+                  {isLogging ? <><Loader2 style={{ width: "15px", height: "15px", animation: "spin 1s linear infinite" }} /> Processing...</> : <><Plus style={{ width: "15px", height: "15px" }} /> Add to Diary</>}
                 </button>
               </div>
-            </Dialog.Content>
-          </Dialog.Portal>
-        </Dialog.Root>
-      </div>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
 
       <OnboardingModal open={isOnboardingOpen} onOpenChange={setIsOnboardingOpen} />
 
+      <style>{`
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 99px; }
+        textarea::placeholder, input::placeholder { color: rgba(255,255,255,0.2); }
+
+        .dash-root { min-height: 100vh; background: #050506; font-family: Inter, sans-serif; color: #f4f1ea; }
+
+        /* ── SIDEBAR ── */
+        .dash-sidebar {
+          position: fixed; left: 0; top: 0; bottom: 0;
+          width: 72px;
+          background: rgba(8,8,10,0.96);
+          border-right: 1px solid rgba(255,255,255,0.07);
+          backdrop-filter: blur(24px);
+          display: flex; flex-direction: column;
+          padding: 1.5rem 0;
+          transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
+          z-index: 95; overflow: hidden;
+        }
+        .dash-sidebar.sidebar-open { width: 224px; }
+
+        .sidebar-logo { display: flex; align-items: center; gap: 12px; padding: 0 16px; margin-bottom: 2.5rem; overflow: hidden; }
+        .logo-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(245,235,185,0.9); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(245,179,92,0.25); box-shadow: 0 8px 24px rgba(245,196,123,0.18); }
+        .logo-text { font-size: 15px; font-weight: 700; color: #f4f1ea; white-space: nowrap; opacity: 0; transform: translateX(-8px); transition: opacity 0.2s, transform 0.2s; }
+        .logo-text.visible { opacity: 1; transform: translateX(0); }
+
+        .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 0 8px; }
+        .sidebar-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 8px 8px; }
+
+        .sidebar-user { display: flex; align-items: center; gap: 12px; padding: 0 16px; overflow: hidden; }
+        .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: rgba(245,179,92,0.15); border: 1px solid rgba(245,179,92,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; font-weight: 700; color: #f5b35c; }
+        .user-info { overflow: hidden; opacity: 0; transform: translateX(-8px); transition: opacity 0.2s, transform 0.2s; white-space: nowrap; flex: 1; }
+        .user-info.visible { opacity: 1; transform: translateX(0); }
+        .user-name { font-size: 13px; font-weight: 600; color: #f4f1ea; }
+        .user-plan { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #f5b35c; opacity: 0.7; }
+
+        /* ── MAIN ── */
+        .dash-main { margin-left: 72px; padding: 1.75rem 1.5rem 6rem; transition: margin-left 0.3s; }
+
+        /* ── HEADER ── */
+        .dash-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; gap: 12px; }
+        .header-left { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
+        .header-title { font-size: 20px; font-weight: 700; color: #f4f1ea; letter-spacing: -0.01em; }
+        .header-sub { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 3px; }
+        .header-right { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+        .date-pill { display: flex; align-items: center; gap: 7px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 8px 12px; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.45); white-space: nowrap; }
+        .notif-dot { width: 7px; height: 7px; background: #ef4444; border-radius: 50%; position: absolute; top: 9px; right: 9px; border: 1.5px solid #050506; }
+
+        /* ── ICON BTN ── */
+        .icon-btn { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: background 0.15s; }
+        .icon-btn:hover { background: rgba(255,255,255,0.06); }
+        .mobile-menu-btn { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+
+        /* ── CONTENT GRID ── */
+        .dash-grid {
+          display: grid;
+          gap: 14px;
+          grid-template-columns: 1fr;
+          grid-template-areas:
+            "calorie"
+            "stats"
+            "meals"
+            "actions";
+        }
+        .calorie-card  { grid-area: calorie; }
+        .stats-grid    { grid-area: stats; }
+        .meals-panel   { grid-area: meals; }
+        .quick-actions { grid-area: actions; }
+
+        /* ── CARDS ── */
+        .calorie-card {
+          background: linear-gradient(145deg, #0e0b06, #0d0b05);
+          border: 1px solid rgba(245,179,92,0.12);
+          border-radius: 22px; padding: 1.5rem;
+          position: relative; overflow: hidden;
+        }
+        .card-glow { position: absolute; left: -20%; top: -20%; width: 80%; height: 80%; border-radius: 50%; background: radial-gradient(ellipse, rgba(245,179,92,0.14), transparent 68%); filter: blur(40px); pointer-events: none; }
+        .card-dots { position: absolute; inset: 0; opacity: 0.06; background-image: radial-gradient(circle, rgba(244,241,234,0.5) 0 1px, transparent 1.5px); background-size: 28px 28px; pointer-events: none; }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        .meals-panel {
+          background: rgba(10,10,12,0.92);
+          border: 1px solid rgba(255,255,255,0.07);
+          border-radius: 22px; padding: 1.25rem;
+          backdrop-filter: blur(16px);
+        }
+        .log-list { max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 2px; margin-bottom: 1rem; }
+        .log-item { display: flex; align-items: center; gap: 8px; padding: 10px 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 13px; transition: background 0.15s; }
+        .log-btn { width: 100%; background: #f4e7d1; border: none; border-radius: 13px; padding: 12px; font-size: 13px; font-weight: 700; color: #000; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 8px 28px rgba(245,179,92,0.18); transition: background 0.2s, transform 0.1s; }
+        .log-btn:hover { background: #fde68a; }
+        .log-btn:active { transform: scale(0.98); }
+
+        .quick-actions { }
+        .action-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+        /* ── MOBILE BOTTOM NAV ── */
+        .mobile-nav {
+          position: fixed; bottom: 0; left: 0; right: 0;
+          background: rgba(8,8,10,0.96); border-top: 1px solid rgba(255,255,255,0.07);
+          backdrop-filter: blur(24px);
+          display: flex; z-index: 80;
+          padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+        }
+        .mobile-nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.35); font-size: 10px; font-weight: 600; padding: 6px 0; }
+        .mobile-nav-btn.active { color: #f5b35c; }
+
+        /* ── MOBILE FAB ── */
+        .mobile-fab {
+          position: fixed; bottom: 72px; right: 20px;
+          width: 52px; height: 52px; border-radius: 16px;
+          background: #f4e7d1; border: none;
+          display: flex; align-items: center; justify-content: center;
+          box-shadow: 0 8px 28px rgba(245,179,92,0.35);
+          cursor: pointer; z-index: 81; color: #000;
+          transition: transform 0.15s, background 0.15s;
+        }
+        .mobile-fab:active { transform: scale(0.93); background: #fde68a; }
+
+        /* ── LOG MODAL ── */
+        .log-modal {
+          position: fixed; left: 50%; top: 50%; transform: translate(-50%,-50%);
+          background: rgba(10,10,12,0.98); border: 1px solid rgba(255,255,255,0.07);
+          border-radius: 24px; padding: 2rem; z-index: 101;
+          width: 92vw; max-width: 460px;
+          backdrop-filter: blur(24px);
+          box-shadow: 0 40px 120px rgba(0,0,0,0.8); outline: none;
+          overflow: hidden;
+        }
+        .modal-glow { position: absolute; left: -20%; top: -20%; width: 70%; height: 70%; border-radius: 50%; background: radial-gradient(ellipse, rgba(245,179,92,0.12), transparent 68%); filter: blur(40px); pointer-events: none; }
+        .modal-dots { position: absolute; inset: 0; opacity: 0.05; background-image: radial-gradient(circle, rgba(244,241,234,0.5) 0 1px, transparent 1.5px); background-size: 28px 28px; pointer-events: none; }
+
+        /* ── TABLET: 768px+ ── */
+        @media (min-width: 768px) {
+          .dash-main { margin-left: 72px; padding: 2rem 2rem 3rem; }
+          .header-title { font-size: 22px; }
+          .dash-grid {
+            grid-template-columns: 1fr 1fr;
+            grid-template-areas:
+              "calorie stats"
+              "meals   meals"
+              "actions actions";
+          }
+          .log-list { max-height: 320px; }
+          .mobile-nav { display: none; }
+          .mobile-fab { display: none; }
+        }
+
+        /* ── DESKTOP: 1200px+ ── */
+        @media (min-width: 1200px) {
+          .dash-main { margin-left: 72px; padding: 2rem 2.5rem 3rem; }
+          .header-title { font-size: 22px; }
+          .dash-grid {
+            grid-template-columns: 1.1fr 0.9fr 340px;
+            grid-template-rows: auto auto;
+            grid-template-areas:
+              "calorie stats  meals"
+              "actions actions meals";
+            align-items: start;
+          }
+          .meals-panel { position: sticky; top: 1.5rem; }
+          .log-list { max-height: 360px; }
+        }
+
+        /* ── WIDE DESKTOP: 1500px+ ── */
+        @media (min-width: 1500px) {
+          .dash-grid {
+            grid-template-columns: 1.2fr 1fr 380px;
+          }
+        }
+      `}</style>
     </div>
   );
 }
 
-// Subcomponents
+/* ── Sub-components ── */
 
-function NavItem({ icon, label, active = false, expanded = false }: { icon: React.ReactNode, label: string, active?: boolean, expanded?: boolean }) {
+function SideNavItem({ icon, label, active = false, expanded, onClick }: { icon: React.ReactNode; label: string; active?: boolean; expanded: boolean; onClick?: () => void }) {
   return (
-    <div className={`flex items-center gap-4 transition-all duration-300 group cursor-pointer ${
-      active ? 'bg-[#adff00] text-black shadow-lg shadow-[#adff00]/20' : 'hover:bg-zinc-800/50 hover:text-white text-zinc-400'
-    } ${expanded ? 'w-full px-4 py-3 rounded-2xl' : 'w-10 h-10 rounded-xl justify-center'}`}>
-      <div className={`w-10 h-10 flex items-center justify-center shrink-0 transition-transform duration-300 ${active ? 'scale-110' : 'group-hover:scale-110'}`}>
-        {React.isValidElement(icon) && React.cloneElement(icon as React.ReactElement, { className: "w-6 h-6" } as any)}
+    <div onClick={onClick} style={{ display: "flex", alignItems: "center", gap: "12px", padding: expanded ? "9px 12px" : "9px", borderRadius: "13px", cursor: "pointer", transition: "background 0.15s", background: active ? "rgba(245,179,92,0.12)" : "transparent", overflow: "hidden", whiteSpace: "nowrap" }}
+      onMouseOver={e => { if (!active) (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)"; }}
+      onMouseOut={e => { if (!active) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
+    >
+      <div style={{ width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: active ? "#f5b35c" : "rgba(255,255,255,0.38)" }}>
+        {React.isValidElement(icon) && React.cloneElement(icon as React.ReactElement<any>, { style: { width: "18px", height: "18px" } })}
       </div>
-      <span className={`font-bold text-sm whitespace-nowrap transition-all duration-300 ${
-        expanded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 w-0 pointer-events-none'
-      }`}>
+      <span style={{ fontSize: "13px", fontWeight: 600, color: active ? "#f5b35c" : "rgba(255,255,255,0.45)", opacity: expanded ? 1 : 0, transform: expanded ? "translateX(0)" : "translateX(-8px)", transition: "opacity 0.2s, transform 0.2s" }}>
         {label}
       </span>
     </div>
   );
 }
 
-function MacroRing({ label, eaten, target, color }: { label: string, eaten: number, target: number, color: string }) {
-  const radius = 32;
-  const circumference = 2 * Math.PI * radius;
-  const percentage = Math.min((eaten / target) * 100, 100) || 0;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
-
+function MacroRing({ label, eaten, target, color }: { label: string; eaten: number; target: number; color: string }) {
+  const r = 26; const circ = 2 * Math.PI * r;
+  const pct = Math.min((eaten / target) * 100, 100) || 0;
   return (
-    <div className="flex flex-col items-center relative group">
-       <div className="relative w-20 h-20 flex items-center justify-center">
-         <svg className="transform -rotate-90 w-20 h-20" viewBox="0 0 80 80">
-            <circle
-              cx="40"
-              cy="40"
-              r={radius}
-              stroke="currentColor"
-              strokeWidth="7"
-              fill="transparent"
-              className="text-zinc-800"
-            />
-            <circle
-              cx="40"
-              cy="40"
-              r={radius}
-              stroke={color}
-              strokeWidth="7"
-              fill="transparent"
-              strokeDasharray={circumference}
-              strokeDashoffset={strokeDashoffset}
-              strokeLinecap="round"
-              className="transition-all duration-1000 ease-out"
-            />
-         </svg>
-         <div className="absolute flex flex-col items-center">
-           <span className="text-[10px] font-black text-white leading-none">{Math.round(percentage)}%</span>
-         </div>
-       </div>
-       <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mt-3">{label}</span>
-       
-       <div className="absolute -top-12 opacity-0 group-hover:opacity-100 transition-all bg-white text-zinc-900 px-3 py-1.5 rounded-xl text-[10px] font-black shadow-2xl pointer-events-none whitespace-nowrap border border-zinc-100 scale-90 group-hover:scale-100">
-         {eaten} / {target}g
-       </div>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "5px" }}>
+      <div style={{ position: "relative", width: "64px", height: "64px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <svg style={{ transform: "rotate(-90deg)", position: "absolute" }} width="64" height="64" viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r={r} stroke="rgba(255,255,255,0.06)" strokeWidth="5.5" fill="none" />
+          <circle cx="32" cy="32" r={r} stroke={color} strokeWidth="5.5" fill="none" strokeDasharray={circ} strokeDashoffset={circ - (pct / 100) * circ} strokeLinecap="round" style={{ transition: "stroke-dashoffset 1s ease" }} />
+        </svg>
+        <span style={{ fontSize: "11px", fontWeight: 700, color: "rgba(255,255,255,0.8)", position: "relative" }}>{Math.round(pct)}%</span>
+      </div>
+      <span style={{ fontSize: "10px", fontWeight: 600, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.1em" }}>{label}</span>
+      <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.22)" }}>{eaten}/{target}g</span>
     </div>
   );
 }
 
-function StatCard({ icon, title, value, subtitle, color }: { icon: React.ReactNode, title: string, value: string, subtitle: string, color: string }) {
-  const bgColors: Record<string, string> = {
-    blue: 'bg-blue-50/50 text-blue-600',
-    orange: 'bg-orange-50/50 text-orange-600',
-    pink: 'bg-pink-50/50 text-pink-600',
-    red: 'bg-red-50/50 text-red-600'
-  }
-
+function StatCard({ icon, title, value, sub, iconColor }: { icon: React.ReactNode; title: string; value: string; sub: string; iconColor: string }) {
   return (
-    <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-zinc-100 flex flex-col items-start hover:shadow-xl hover:translate-y-[-4px] transition-all group overflow-hidden relative">
-      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform ${bgColors[color]}`}>
-        {icon}
+    <div style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "18px", padding: "1rem", transition: "transform 0.2s, background 0.2s", cursor: "default" }}
+      onMouseOver={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.045)"; (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; }}
+      onMouseOut={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.025)"; (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; }}
+    >
+      <div style={{ width: "34px", height: "34px", borderRadius: "10px", background: `${iconColor}18`, border: `1px solid ${iconColor}28`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "12px" }}>
+        {React.isValidElement(icon) && React.cloneElement(icon as React.ReactElement<any>, { style: { width: "16px", height: "16px", color: iconColor } })}
       </div>
-      <p className="text-[10px] font-bold text-zinc-400 mb-1 uppercase tracking-widest group-hover:text-zinc-600 transition-colors">{title}</p>
-      <h4 className="font-black text-zinc-900 text-xl tracking-tight">{value}</h4>
-      <p className="text-[10px] text-zinc-500 font-bold mt-1.5 uppercase tracking-wider">{subtitle}</p>
-      
-      <div className={`absolute top-0 right-0 w-24 h-24 blur-3xl opacity-0 group-hover:opacity-20 transition-opacity ${bgColors[color]}`}></div>
+      <p style={{ fontSize: "10px", fontWeight: 600, color: "rgba(255,255,255,0.28)", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 4px" }}>{title}</p>
+      <p style={{ fontSize: "15px", fontWeight: 700, color: "#f4f1ea", margin: "0 0 2px", letterSpacing: "-0.01em" }}>{value}</p>
+      <p style={{ fontSize: "10px", color: "rgba(255,255,255,0.25)", margin: 0 }}>{sub}</p>
+    </div>
+  );
+}
+
+function ActionCard({ color, icon, title, sub, locked }: { color: string; icon: React.ReactNode; title: string; sub: string; locked?: boolean }) {
+  return (
+    <div style={{ borderRadius: "18px", padding: "1.1rem", background: `${color}12`, border: `1px solid ${color}22`, cursor: "pointer", transition: "transform 0.2s", minHeight: "120px", display: "flex", flexDirection: "column", justifyContent: "space-between", position: "relative" }}
+      onMouseOver={e => (e.currentTarget as HTMLElement).style.transform = "translateY(-3px)"}
+      onMouseOut={e => (e.currentTarget as HTMLElement).style.transform = "translateY(0)"}
+    >
+      {locked && (
+        <div style={{ position: "absolute", top: "10px", right: "10px", background: "rgba(245,179,92,0.12)", border: "1px solid rgba(245,179,92,0.2)", borderRadius: "6px", padding: "3px 7px", display: "flex", alignItems: "center", gap: "3px" }}>
+          <Lock style={{ width: "9px", height: "9px", color: "#f5b35c" }} />
+          <span style={{ fontSize: "8px", fontWeight: 700, color: "#f5b35c", textTransform: "uppercase", letterSpacing: "0.1em" }}>Pro</span>
+        </div>
+      )}
+      <div style={{ width: "36px", height: "36px", borderRadius: "11px", background: `${color}18`, border: `1px solid ${color}28`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        {React.isValidElement(icon) && React.cloneElement(icon as React.ReactElement<any>, { style: { width: "17px", height: "17px", color } })}
+      </div>
+      <div>
+        <h4 style={{ fontSize: "13px", fontWeight: 700, color: "#f4f1ea", margin: "0 0 3px", lineHeight: 1.2 }}>{title}</h4>
+        <p style={{ fontSize: "9px", fontWeight: 600, color: `${color}99`, textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>{sub}</p>
+      </div>
     </div>
   );
 }
