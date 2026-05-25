@@ -9,6 +9,7 @@ import { format, addDays, subDays } from "date-fns";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import OnboardingModal from "../components/OnboardingModal";
+import SharedSidebar from "../components/SharedSidebar";
 import { getCurrentMealTime, getMealTimeOfDay, getMealTypeLabel } from "../utils/mealTime";
 
 type FoodLog = {
@@ -64,7 +65,8 @@ export default function Dashboard() {
     if (!user) return;
     try {
       setLoadingLogs(true);
-      const res = await fetch("/api/food/log", { headers: { Authorization: `Bearer ${user.token}` } });
+      const dateStr = format(currentDate, "yyyy-MM-dd");
+      const res = await fetch(`/api/food/log?date=${dateStr}`, { headers: { Authorization: `Bearer ${user.token}` } });
       const ct = res.headers.get("content-type") || "";
       if (!res.ok) throw new Error(await res.text());
       if (!ct.includes("application/json")) throw new Error("Expected JSON");
@@ -165,44 +167,8 @@ export default function Dashboard() {
           style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", zIndex: 90 }} />
       )}
 
-      {/* ── SIDEBAR ── */}
-      <aside className={`dash-sidebar ${sidebarOpen ? "sidebar-open" : ""}`}
-        onMouseEnter={() => !isMobile && setSidebarOpen(true)}
-        onMouseLeave={() => !isMobile && setSidebarOpen(false)}
-      >
-        {/* Logo */}
-        <div className="sidebar-logo">
-          <div className="logo-icon">
-            <Flame style={{ width: "18px", height: "18px", color: "#000" }} />
-          </div>
-          <span className={`logo-text ${sidebarOpen ? "visible" : ""}`}>CalTrack</span>
-        </div>
-
-        {/* Nav */}
-        <nav className="sidebar-nav">
-          <SideNavItem icon={<Home />}       label="Dashboard"   active expanded={sidebarOpen} onClick={() => navigate("/dashboard")} />
-          <SideNavItem icon={<Utensils />}   label="My Meals"    expanded={sidebarOpen} onClick={() => navigate("/my-meals")} />
-          <SideNavItem icon={<Activity />}   label="Health"      expanded={sidebarOpen} />
-          <SideNavItem icon={<TrendingUp />} label="Progress"    expanded={sidebarOpen} onClick={() => navigate("/progress")} />
-          <SideNavItem icon={<Calendar />}   label="History"     expanded={sidebarOpen} />
-          <div className="sidebar-divider" />
-          <SideNavItem icon={<Settings />}   label="Settings"    expanded={sidebarOpen} />
-        </nav>
-
-        {/* User */}
-        <div className="sidebar-user">
-          <div className="user-avatar">
-            {(user?.name || "G")[0].toUpperCase()}
-          </div>
-          <div className={`user-info ${sidebarOpen ? "visible" : ""}`}>
-            <p className="user-name">{user?.name || "Guest"}</p>
-            <p className="user-plan">Premium</p>
-          </div>
-          {sidebarOpen && (
-            <LogOut onClick={logout} style={{ width: "15px", height: "15px", color: T.textMuted, cursor: "pointer", flexShrink: 0, marginLeft: "auto" }} />
-          )}
-        </div>
-      </aside>
+      {/* ── SHARED SIDEBAR ── */}
+      <SharedSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} isMobile={isMobile} activePage="dashboard" />
 
       {/* ── MAIN ── */}
       <main className="dash-main">
@@ -693,22 +659,6 @@ export default function Dashboard() {
 }
 
 /* ── Sub-components ── */
-
-function SideNavItem({ icon, label, active = false, expanded, onClick }: { icon: React.ReactNode; label: string; active?: boolean; expanded: boolean; onClick?: () => void }) {
-  return (
-    <div onClick={onClick} style={{ display: "flex", alignItems: "center", gap: "12px", padding: expanded ? "9px 12px" : "9px", borderRadius: "13px", cursor: "pointer", transition: "background 0.15s", background: active ? "rgba(245,179,92,0.12)" : "transparent", overflow: "hidden", whiteSpace: "nowrap" }}
-      onMouseOver={e => { if (!active) (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)"; }}
-      onMouseOut={e => { if (!active) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
-    >
-      <div style={{ width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: active ? "#f5b35c" : "rgba(255,255,255,0.38)" }}>
-        {React.isValidElement(icon) && React.cloneElement(icon as React.ReactElement<any>, { style: { width: "18px", height: "18px" } })}
-      </div>
-      <span style={{ fontSize: "13px", fontWeight: 600, color: active ? "#f5b35c" : "rgba(255,255,255,0.45)", opacity: expanded ? 1 : 0, transform: expanded ? "translateX(0)" : "translateX(-8px)", transition: "opacity 0.2s, transform 0.2s" }}>
-        {label}
-      </span>
-    </div>
-  );
-}
 
 function MacroRing({ label, eaten, target, color }: { label: string; eaten: number; target: number; color: string }) {
   const r = 26; const circ = 2 * Math.PI * r;

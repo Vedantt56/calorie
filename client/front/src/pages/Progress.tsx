@@ -1,18 +1,15 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  Activity,
-  Bell,
-  Calendar,
-  Flame,
-  Home,
-  LogOut,
-  Settings,
   TrendingUp,
-  Utensils,
+  Flame,
+  Loader2,
+  Calendar,
+  Bell,
 } from "lucide-react";
 import { format, subDays } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import SharedSidebar from "../components/SharedSidebar";
 
 type FoodLog = {
   _id?: string;
@@ -40,7 +37,7 @@ const T = {
 };
 
 export default function Progress() {
-  const { user, loading: authLoading, logout } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [logs, setLogs] = useState<FoodLog[]>([]);
   const [loadingLogs, setLoadingLogs] = useState(true);
@@ -137,39 +134,8 @@ export default function Progress() {
         />
       )}
 
-      <aside
-        className={`progress-sidebar ${sidebarOpen ? "sidebar-open" : ""}`}
-        onMouseEnter={() => !isMobile && setSidebarOpen(true)}
-        onMouseLeave={() => !isMobile && setSidebarOpen(false)}
-      >
-        <div className="sidebar-logo">
-          <div className="logo-icon">
-            <Flame style={{ width: "18px", height: "18px", color: "#000" }} />
-          </div>
-          <span className={`logo-text ${sidebarOpen ? "visible" : ""}`}>CalTrack</span>
-        </div>
-
-        <nav className="sidebar-nav">
-          <SideNavItem icon={<Home />} label="Dashboard" expanded={sidebarOpen} onClick={() => navigate("/dashboard")} />
-          <SideNavItem icon={<Utensils />} label="My Meals" expanded={sidebarOpen} onClick={() => navigate("/my-meals")} />
-          <SideNavItem icon={<Activity />} label="Health" expanded={sidebarOpen} />
-          <SideNavItem icon={<TrendingUp />} label="Progress" active expanded={sidebarOpen} onClick={() => navigate("/progress")} />
-          <SideNavItem icon={<Calendar />} label="History" expanded={sidebarOpen} />
-          <div className="sidebar-divider" />
-          <SideNavItem icon={<Settings />} label="Settings" expanded={sidebarOpen} />
-        </nav>
-
-        <div className="sidebar-user">
-          <div className="user-avatar">{(user?.name || "G")[0].toUpperCase()}</div>
-          <div className={`user-info ${sidebarOpen ? "visible" : ""}`}>
-            <p className="user-name">{user?.name || "Guest"}</p>
-            <p className="user-plan">Premium</p>
-          </div>
-          {sidebarOpen && (
-            <LogOut onClick={logout} style={{ width: "15px", height: "15px", color: T.textMuted, cursor: "pointer", flexShrink: 0, marginLeft: "auto" }} />
-          )}
-        </div>
-      </aside>
+      {/* SHARED SIDEBAR */}
+      <SharedSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} isMobile={isMobile} activePage="progress" />
 
       <main className="progress-main">
         <header className="progress-header">
@@ -299,20 +265,6 @@ export default function Progress() {
 
       <style>{`
         .progress-root { min-height: 100vh; background: ${T.bg}; font-family: Inter, sans-serif; color: ${T.text}; }
-        .progress-sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 72px; background: rgba(8,8,10,0.96); border-right: 1px solid rgba(255,255,255,0.07); backdrop-filter: blur(24px); display: flex; flex-direction: column; padding: 1.5rem 0; transition: width 0.3s cubic-bezier(0.4,0,0.2,1); z-index: 95; overflow: hidden; }
-        .progress-sidebar.sidebar-open { width: 224px; }
-        .sidebar-logo { display: flex; align-items: center; gap: 12px; padding: 0 16px; margin-bottom: 2.5rem; overflow: hidden; }
-        .logo-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(245,235,185,0.9); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(245,179,92,0.25); box-shadow: 0 8px 24px rgba(245,196,123,0.18); }
-        .logo-text { font-size: 15px; font-weight: 700; color: #f4f1ea; white-space: nowrap; opacity: 0; transform: translateX(-8px); transition: opacity 0.2s, transform 0.2s; }
-        .logo-text.visible { opacity: 1; transform: translateX(0); }
-        .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 0 8px; }
-        .sidebar-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 8px 8px; }
-        .sidebar-user { display: flex; align-items: center; gap: 12px; padding: 0 16px; overflow: hidden; }
-        .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: rgba(245,179,92,0.15); border: 1px solid rgba(245,179,92,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; font-weight: 700; color: #f5b35c; }
-        .user-info { overflow: hidden; opacity: 0; transform: translateX(-8px); transition: opacity 0.2s, transform 0.2s; white-space: nowrap; flex: 1; }
-        .user-info.visible { opacity: 1; transform: translateX(0); }
-        .user-name { font-size: 13px; font-weight: 600; color: #f4f1ea; margin: 0; }
-        .user-plan { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #f5b35c; opacity: 0.7; margin: 0; }
         .progress-main { margin-left: 72px; max-width: 1180px; margin-right: auto; padding: 1.75rem 1.5rem 3rem; transition: margin-left 0.3s; }
         .progress-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; gap: 12px; }
         .header-left { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
@@ -373,54 +325,4 @@ export default function Progress() {
   );
 }
 
-function SideNavItem({ icon, label, active = false, expanded, onClick }: { icon: React.ReactNode; label: string; active?: boolean; expanded: boolean; onClick?: () => void }) {
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "12px",
-        padding: expanded ? "9px 12px" : "9px",
-        borderRadius: "13px",
-        cursor: "pointer",
-        transition: "background 0.15s",
-        background: active ? "rgba(245,179,92,0.12)" : "transparent",
-        overflow: "hidden",
-        whiteSpace: "nowrap",
-      }}
-      onMouseOver={(e) => {
-        if (!active) (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)";
-      }}
-      onMouseOut={(e) => {
-        if (!active) (e.currentTarget as HTMLElement).style.background = "transparent";
-      }}
-    >
-      <div
-        style={{
-          width: "36px",
-          height: "36px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-          color: active ? "#f5b35c" : "rgba(255,255,255,0.38)",
-        }}
-      >
-        {React.isValidElement(icon) && React.cloneElement(icon as React.ReactElement<any>, { style: { width: "18px", height: "18px" } })}
-      </div>
-      <span
-        style={{
-          fontSize: "13px",
-          fontWeight: 600,
-          color: active ? "#f5b35c" : "rgba(255,255,255,0.45)",
-          opacity: expanded ? 1 : 0,
-          transform: expanded ? "translateX(0)" : "translateX(-8px)",
-          transition: "opacity 0.2s, transform 0.2s",
-        }}
-      >
-        {label}
-      </span>
-    </div>
-  );
-}
+

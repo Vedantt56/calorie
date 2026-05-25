@@ -219,3 +219,115 @@
   right: 0;
   border-right-color: var(--border);
 }
+
+/* Micro-interaction animations */
+
+@keyframes buttonHover {
+  from {
+    transform: scale(1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  to {
+    transform: scale(1.02);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  }
+}
+
+@keyframes linkGlow {
+  from {
+    color: rgba(255, 255, 255, 0.6);
+  }
+  to {
+    color: rgba(255, 255, 255, 1);
+    text-shadow: 0 0 8px rgba(255, 196, 118, 0.3);
+  }
+}
+
+@keyframes cardHover {
+  from {
+    transform: translateY(0px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+  to {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  }
+}
+
+@keyframes iconSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes accentPulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(255, 196, 118, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(255, 196, 118, 0);
+  }
+}
+
+/* Interactive element utilities */
+
+.landing-link {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.landing-link:hover {
+  animation: linkGlow 0.4s ease-out forwards;
+}
+
+.landing-button {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+.landing-button:hover {
+  animation: buttonHover 0.3s ease-out forwards;
+}
+
+.landing-button:active {
+  transform: scale(0.98);
+}
+
+.landing-card {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+.landing-card:hover {
+  animation: cardHover 0.4s ease-out forwards;
+}
+
+.landing-icon {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.landing-icon:hover {
+  animation: iconSpin 0.6s ease-out forwards;
+}
+
+.accent-pulse {
+  animation: accentPulse 2s ease-in-out infinite;
+}
+
+/* Text reveal animation utilities */
+
+.text-reveal {
+  animation: textGlowReveal 0.8s ease-out forwards;
+}
+
+.card-land {
+  animation: cardLand 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.feature-float {
+  animation: featureCardFloat 3s ease-in-out infinite;
+}

@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import MyMeals from './pages/MyMeals';
+import History from './pages/History';
 import GoogleCallback from './pages/GoogleCallback';
 import LandingPage from './pages/LandingPage';
 import Progress from './pages/Progress';
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/my-meals" element={<MyMeals />} />
           <Route path="/progress" element={<Progress />} />
+          <Route path="/history" element={<History />} />
           {/* Catch all redirect */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

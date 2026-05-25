@@ -28,7 +28,19 @@ const processAndLogFood = async (item, userId) => {
 
 export const getLogs = async (req, res) => {
     try {
-        const logs = await FoodLog.find({ user: req.user.id }).sort({ createdAt: -1 }).limit(20);
+        // Get the date from query parameters (e.g., ?date=2024-05-24) or use today
+        const dateParam = req.query.date;
+        const targetDate = dateParam ? new Date(dateParam) : new Date();
+        
+        // Set to start of day in UTC
+        targetDate.setUTCHours(0, 0, 0, 0);
+        const nextDay = new Date(targetDate);
+        nextDay.setUTCDate(nextDay.getUTCDate() + 1);
+
+        const logs = await FoodLog.find({ 
+            user: req.user.id,
+            createdAt: { $gte: targetDate, $lt: nextDay }
+        }).sort({ createdAt: -1 }).limit(20);
         res.json(logs);
     } catch (err) {
         res.status(500).json({ message: err.message });

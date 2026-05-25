@@ -196,6 +196,7 @@ a {
     0 46px 140px rgba(0, 0, 0, 0.58),
     inset 0 1px 0 rgba(255, 255, 255, 0.18);
   transform: rotate(-8deg);
+  animation: planetFloat 6s ease-in-out infinite;
 }
 
 .nutrition-planet img {
@@ -271,12 +272,31 @@ a {
   border-radius: 999px;
   background: rgba(255, 224, 181, 0.68);
   box-shadow: 0 0 22px rgba(255, 196, 118, 0.5);
+  animation: constellationTwinkle 4s ease-in-out infinite;
 }
 
-.data-constellation span:nth-child(1) { left: 12%; top: 24%; }
-.data-constellation span:nth-child(2) { right: 16%; top: 18%; background: rgba(141, 220, 236, 0.55); }
-.data-constellation span:nth-child(3) { left: 22%; bottom: 18%; }
-.data-constellation span:nth-child(4) { right: 12%; bottom: 28%; background: rgba(141, 220, 236, 0.48); }
+.data-constellation span:nth-child(1) {
+  left: 12%;
+  top: 24%;
+  animation-delay: 0s;
+}
+.data-constellation span:nth-child(2) {
+  right: 16%;
+  top: 18%;
+  background: rgba(141, 220, 236, 0.55);
+  animation-delay: 0.8s;
+}
+.data-constellation span:nth-child(3) {
+  left: 22%;
+  bottom: 18%;
+  animation-delay: 1.6s;
+}
+.data-constellation span:nth-child(4) {
+  right: 12%;
+  bottom: 28%;
+  background: rgba(141, 220, 236, 0.48);
+  animation-delay: 2.4s;
+}
 
 .nutrition-landscape {
   position: absolute;
@@ -312,7 +332,9 @@ a {
   from {
     transform: translate3d(-2%, -1%, 0) rotate(0deg) scale(1);
   }
-
+  50% {
+    transform: translate3d(1%, 1%, 0) rotate(5deg) scale(1.03);
+  }
   to {
     transform: translate3d(2%, 2%, 0) rotate(10deg) scale(1.05);
   }
@@ -320,38 +342,57 @@ a {
 
 @keyframes scanPulse {
   0%, 100% {
-    opacity: 0.34;
-    transform: scale(0.96) rotate(12deg);
+    opacity: 0.28;
+    transform: scale(0.92) rotate(12deg);
+    filter: drop-shadow(0 0 8px rgba(255, 196, 118, 0));
   }
-
+  25% {
+    opacity: 0.54;
+    transform: scale(0.98) rotate(15deg);
+    filter: drop-shadow(0 0 12px rgba(255, 196, 118, 0.3));
+  }
   50% {
-    opacity: 0.8;
-    transform: scale(1.03) rotate(18deg);
+    opacity: 0.88;
+    transform: scale(1.06) rotate(18deg);
+    filter: drop-shadow(0 0 18px rgba(255, 196, 118, 0.5));
+  }
+  75% {
+    opacity: 0.54;
+    transform: scale(0.98) rotate(15deg);
+    filter: drop-shadow(0 0 12px rgba(255, 196, 118, 0.3));
   }
 }
 
 @keyframes scanSweep {
   0%, 100% {
-    transform: translateX(-180%) rotate(18deg);
+    transform: translateX(-200%) rotate(18deg);
     opacity: 0;
   }
-
-  35%, 65% {
-    opacity: 0.75;
+  10% {
+    opacity: 0.4;
   }
-
+  30%, 70% {
+    opacity: 0.85;
+  }
   50% {
-    transform: translateX(180%) rotate(18deg);
+    transform: translateX(0%) rotate(18deg);
+    opacity: 0.95;
+    filter: drop-shadow(0 0 16px rgba(255, 210, 150, 0.6));
+  }
+  90% {
+    opacity: 0.4;
   }
 }
 
 @keyframes ribbonDrift {
   from {
-    transform: translateY(-8px) rotate(-14deg);
+    transform: translateY(-12px) translateX(-2px) rotate(-14deg);
   }
-
+  50% {
+    transform: translateY(2px) translateX(1px) rotate(-10deg);
+  }
   to {
-    transform: translateY(12px) rotate(-7deg);
+    transform: translateY(16px) translateX(-1px) rotate(-7deg);
   }
 }
 
@@ -392,6 +433,77 @@ a {
 
   to {
     background-position: 132px 132px, 216px 232px;
+  }
+}
+
+@keyframes constellationTwinkle {
+  0%, 100% {
+    opacity: 0.6;
+    filter: drop-shadow(0 0 4px rgba(255, 196, 118, 0.3));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 12px rgba(255, 196, 118, 0.8));
+  }
+}
+
+@keyframes planetFloat {
+  0%, 100% {
+    transform: rotate(-8deg) translateY(-4px);
+  }
+  50% {
+    transform: rotate(-6deg) translateY(4px);
+  }
+}
+
+@keyframes planetRotate {
+  from {
+    transform: rotate(-8deg) scale(1);
+  }
+  to {
+    transform: rotate(352deg) scale(1);
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 46px 140px rgba(0, 0, 0, 0.58), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  }
+  50% {
+    box-shadow: 0 46px 140px rgba(0, 0, 0, 0.58), inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 0 40px rgba(255, 196, 118, 0.15);
+  }
+}
+
+@keyframes textGlowReveal {
+  from {
+    opacity: 0;
+    filter: blur(24px);
+    text-shadow: 0 0 0 rgba(255, 196, 118, 0);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0px);
+    text-shadow: 0 0 12px rgba(255, 196, 118, 0.15);
+  }
+}
+
+@keyframes cardLand {
+  from {
+    opacity: 0;
+    transform: translateY(120px) scale(0.85) skewY(2deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0px) scale(1) skewY(0deg);
+  }
+}
+
+@keyframes featureCardFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
   }
 }
 
@@ -461,7 +573,10 @@ a {
   .scan-ring,
   .scan-beam,
   .energy-ribbon,
-  .landscape-scan {
+  .landscape-scan,
+  .nutrition-planet,
+  .data-constellation span,
+  .dashboard-fade-in {
     animation: none !important;
   }
 

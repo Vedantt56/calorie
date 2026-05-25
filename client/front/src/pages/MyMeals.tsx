@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import {
-  Activity, Calendar, ChevronDown, ChevronLeft, ChevronRight,
+  Calendar, ChevronDown, ChevronLeft, ChevronRight,
   Clock, Flame, Filter, Home, Loader2, Search, Settings,
   Trash2, TrendingUp, Utensils,
 } from "lucide-react";
 import { format, addDays, subDays, startOfDay } from "date-fns";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import SharedSidebar from "../components/SharedSidebar";
 import { getMealTimeOfDay, getMealTypeLabel, getMealTypeColor, type MealType } from "../utils/mealTime";
 
 type FoodLog = {
@@ -175,50 +176,8 @@ export default function MyMeals() {
         />
       )}
 
-      {/* SIDEBAR */}
-      <aside
-        className={`my-meals-sidebar ${sidebarOpen ? "sidebar-open" : ""}`}
-        onMouseEnter={() => !isMobile && setSidebarOpen(true)}
-        onMouseLeave={() => !isMobile && setSidebarOpen(false)}
-      >
-        <div className="sidebar-logo">
-          <div className="logo-icon">
-            <Utensils style={{ width: "18px", height: "18px", color: "#000" }} />
-          </div>
-          <span className={`logo-text ${sidebarOpen ? "visible" : ""}`}>CalTrack</span>
-        </div>
-
-        <nav className="sidebar-nav">
-          <SideNavItem icon={<Home />} label="Dashboard" expanded={sidebarOpen} onClick={() => navigate("/dashboard")} />
-          <SideNavItem icon={<Utensils />} label="My Meals" active expanded={sidebarOpen} onClick={() => navigate("/my-meals")} />
-          <SideNavItem icon={<Activity />} label="Health" expanded={sidebarOpen} />
-          <SideNavItem icon={<TrendingUp />} label="Progress" expanded={sidebarOpen} onClick={() => navigate("/progress")} />
-          <SideNavItem icon={<Calendar />} label="History" expanded={sidebarOpen} />
-          <div className="sidebar-divider" />
-          <SideNavItem icon={<Settings />} label="Settings" expanded={sidebarOpen} />
-        </nav>
-
-        <div className="sidebar-user">
-          <div className="user-avatar">{(user?.name || "G")[0].toUpperCase()}</div>
-          <div className={`user-info ${sidebarOpen ? "visible" : ""}`}>
-            <p className="user-name">{user?.name || "Guest"}</p>
-            <p className="user-plan">Premium</p>
-          </div>
-          {sidebarOpen && (
-            <Flame
-              onClick={logout}
-              style={{
-                width: "15px",
-                height: "15px",
-                color: T.textMuted,
-                cursor: "pointer",
-                flexShrink: 0,
-                marginLeft: "auto",
-              }}
-            />
-          )}
-        </div>
-      </aside>
+      {/* SHARED SIDEBAR */}
+      <SharedSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} isMobile={isMobile} activePage="meals" />
 
       {/* MAIN */}
       <main className="my-meals-main">
@@ -898,69 +857,4 @@ export default function MyMeals() {
   );
 }
 
-function SideNavItem({
-  icon,
-  label,
-  active = false,
-  expanded,
-  onClick,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  active?: boolean;
-  expanded: boolean;
-  onClick?: () => void;
-}) {
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "12px",
-        padding: expanded ? "9px 12px" : "9px",
-        borderRadius: "13px",
-        cursor: "pointer",
-        transition: "background 0.15s",
-        background: active ? "rgba(245,179,92,0.12)" : "transparent",
-        overflow: "hidden",
-        whiteSpace: "nowrap",
-      }}
-      onMouseOver={(e) => {
-        if (!active) (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)";
-      }}
-      onMouseOut={(e) => {
-        if (!active) (e.currentTarget as HTMLElement).style.background = "transparent";
-      }}
-    >
-      <div
-        style={{
-          width: "36px",
-          height: "36px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-          color: active ? "#f5b35c" : "rgba(255,255,255,0.38)",
-        }}
-      >
-        {React.isValidElement(icon) &&
-          React.cloneElement(icon as React.ReactElement<any>, {
-            style: { width: "18px", height: "18px" },
-          })}
-      </div>
-      <span
-        style={{
-          fontSize: "13px",
-          fontWeight: 600,
-          color: active ? "#f5b35c" : "rgba(255,255,255,0.45)",
-          opacity: expanded ? 1 : 0,
-          transform: expanded ? "translateX(0)" : "translateX(-8px)",
-          transition: "opacity 0.2s, transform 0.2s",
-        }}
-      >
-        {label}
-      </span>
-    </div>
-  );
-}
+

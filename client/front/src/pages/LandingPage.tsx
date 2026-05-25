@@ -97,28 +97,32 @@ export default function LandingPage() {
     gsap.ticker.lagSmoothing(0);
 
     const ctx = gsap.context(() => {
+      // Hero text animations with enhanced easing and effects
       gsap.fromTo(
         '.hero-word',
-        { y: 72, opacity: 0, filter: 'blur(18px)' },
-        { y: 0, opacity: 1, filter: 'blur(0px)', duration: 1.15, stagger: 0.08, ease: 'power4.out' },
+        { y: 72, opacity: 0, filter: 'blur(24px)', rotate: -2 },
+        { y: 0, opacity: 1, filter: 'blur(0px)', rotate: 0, duration: 1.2, stagger: 0.06, ease: 'power4.inOut' },
       );
 
+      // Hero scale parallax with smoother values
       gsap.to('.hero-scale', {
-        scale: 0.72,
-        y: -90,
-        opacity: 0.28,
+        scale: 0.85,
+        y: -60,
+        opacity: 0.36,
         ease: 'none',
         scrollTrigger: {
           trigger: '.landing-hero',
           start: 'top top',
           end: 'bottom top',
-          scrub: true,
+          scrub: 0.8,
         },
       });
 
+      // Hero dashboard animation with 3D effects
       gsap.to('.hero-dashboard', {
         y: -120,
-        rotateX: 0,
+        rotateX: 2,
+        rotateY: -1,
         scale: 1,
         opacity: 1,
         ease: 'none',
@@ -126,34 +130,25 @@ export default function LandingPage() {
           trigger: '.landing-hero',
           start: '20% top',
           end: 'bottom top',
-          scrub: true,
+          scrub: 0.8,
         },
       });
 
-      gsap.utils.toArray<HTMLElement>('.float-layer').forEach((layer, index) => {
-        gsap.to(layer, {
-          y: index % 2 === 0 ? -90 : 120,
-          x: index % 2 === 0 ? 40 : -30,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: '.landing-hero',
-            start: 'top top',
-            end: 'bottom top',
-            scrub: true,
-          },
-        });
-      });
+      // Removed float-layer animations for cleaner visual experience
+      // (These created visual noise without adding value)
 
+      // Story pin animations remain efficient
       gsap.utils.toArray<HTMLElement>('.story-pin').forEach((section) => {
         ScrollTrigger.create({
           trigger: section,
           start: 'top top',
           end: 'bottom bottom',
           pin: section.querySelector('.pin-stage'),
-          scrub: true,
+          scrub: 0.8,
         });
       });
 
+      // Enhanced typed meal animation with cursor effect
       gsap.fromTo(
         '.typed-meal',
         { width: '0ch' },
@@ -164,44 +159,49 @@ export default function LandingPage() {
             trigger: '.logging-section',
             start: 'top top',
             end: '35% top',
-            scrub: true,
+            scrub: 0.8,
           },
         },
       );
 
+      // Enhanced processing line with glow and thickness
       gsap.fromTo(
         '.processing-line',
-        { scaleX: 0, transformOrigin: 'left' },
+        { scaleX: 0, transformOrigin: 'left', opacity: 0.6 },
         {
           scaleX: 1,
-          ease: 'power2.out',
+          opacity: 1,
+          ease: 'power2.inOut',
           scrollTrigger: {
             trigger: '.logging-section',
             start: '18% top',
             end: '48% top',
-            scrub: true,
+            scrub: 0.8,
           },
         },
       );
 
+      // Enhanced macro cards with land animation and stagger
       gsap.fromTo(
         '.macro-card',
-        { y: 90, opacity: 0, scale: 0.9 },
+        { y: 90, opacity: 0, scale: 0.9, skewY: 2 },
         {
           y: 0,
           opacity: 1,
           scale: 1,
-          stagger: 0.08,
-          ease: 'power3.out',
+          skewY: 0,
+          stagger: 0.1,
+          ease: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
           scrollTrigger: {
             trigger: '.logging-section',
             start: '38% top',
             end: '82% top',
-            scrub: true,
+            scrub: 0.8,
           },
         },
       );
 
+      // Dashboard strip horizontal scroll
       gsap.to('.dashboard-strip', {
         xPercent: -32,
         ease: 'none',
@@ -209,55 +209,60 @@ export default function LandingPage() {
           trigger: '.dashboard-section',
           start: 'top top',
           end: 'bottom bottom',
-          scrub: true,
+          scrub: 0.8,
         },
       });
 
+      // Enhanced dashboard panels with bounce effect
       gsap.fromTo(
         '.dash-panel',
-        { y: 80, opacity: 0, scale: 0.92 },
+        { y: 80, opacity: 0, scale: 0.92, rotateY: 10 },
         {
           y: 0,
           opacity: 1,
           scale: 1,
+          rotateY: 0,
           stagger: 0.12,
-          ease: 'power3.out',
+          ease: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
           scrollTrigger: {
             trigger: '.dashboard-section',
             start: 'top 30%',
             end: '70% top',
-            scrub: true,
+            scrub: 0.8,
           },
         },
       );
 
+      // Feature cards with enhanced animation and hover prep
       gsap.utils.toArray<HTMLElement>('.feature-card').forEach((card, index) => {
         gsap.fromTo(
           card,
-          { y: 90 + index * 12, scale: 0.92, opacity: 0 },
+          { y: 90 + index * 12, scale: 0.92, opacity: 0, rotateZ: -1 },
           {
             y: 0,
             scale: 1,
             opacity: 1,
-            ease: 'power3.out',
+            rotateZ: 0,
+            ease: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
             scrollTrigger: {
               trigger: card,
               start: 'top 96%',
               end: 'top 68%',
-              scrub: true,
+              scrub: 0.8,
             },
           },
         );
       });
 
+      // Enhanced stat counter with pulse
       gsap.utils.toArray<HTMLElement>('.stat-number').forEach((stat) => {
         const target = Number(stat.dataset.value || 0);
         const decimals = target % 1 === 0 ? 0 : 1;
         const counter = { value: 0 };
         gsap.to(counter, {
           value: target,
-          duration: 1.4,
-          ease: 'power2.out',
+          duration: 1.6,
+          ease: 'power2.inOut',
           onUpdate: () => {
             stat.textContent = counter.value.toFixed(decimals);
           },
@@ -269,6 +274,7 @@ export default function LandingPage() {
         });
       });
 
+      // Final CTA with enhanced effects
       gsap.fromTo(
         '.final-cta-content',
         { y: 80, opacity: 0, scale: 0.95 },
@@ -276,15 +282,58 @@ export default function LandingPage() {
           y: 0,
           opacity: 1,
           scale: 1,
-          ease: 'power4.out',
+          ease: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
           scrollTrigger: {
             trigger: '.final-cta',
             start: 'top 55%',
             end: 'top 10%',
-            scrub: true,
+            scrub: 0.8,
           },
         },
       );
+
+      // NEW: Animations for HeroVisualSystem elements
+      // Planet rotation animation
+      gsap.to('.nutrition-planet', {
+        rotation: 8,
+        duration: 20,
+        ease: 'none',
+        repeat: -1,
+      });
+
+      // Scan rings enhanced animations
+      gsap.to('.scan-ring-one', {
+        rotateZ: 360,
+        duration: 12,
+        ease: 'none',
+        repeat: -1,
+      });
+
+      gsap.to('.scan-ring-two', {
+        rotateZ: -360,
+        duration: 14,
+        ease: 'none',
+        repeat: -1,
+      });
+
+      // Energy ribbon wave effect
+      gsap.to('.energy-ribbon-one', {
+        y: 12,
+        x: 2,
+        duration: 4,
+        ease: 'sine.inOut',
+        repeat: -1,
+        yoyo: true,
+      });
+
+      gsap.to('.energy-ribbon-two', {
+        y: -8,
+        x: -2,
+        duration: 5,
+        ease: 'sine.inOut',
+        repeat: -1,
+        yoyo: true,
+      });
     }, rootRef);
 
     return () => {
@@ -313,20 +362,20 @@ function HeroSection() {
       <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-black/70 to-transparent" />
 
       <nav className="relative z-20 mx-auto flex max-w-6xl items-center justify-between rounded-full border border-white/[0.08] bg-black/20 px-3.5 py-2.5 backdrop-blur-2xl md:px-4">
-        <Link to="/" className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full border border-amber-100/25 bg-amber-100/85 text-black shadow-[0_10px_34px_rgba(245,196,123,0.16)]">
+        <Link to="/" className="flex items-center gap-2.5 transition hover:scale-105">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full border border-amber-100/25 bg-amber-100/85 text-black shadow-[0_10px_34px_rgba(245,196,123,0.16)] transition hover:shadow-[0_10px_50px_rgba(245,196,123,0.3)]">
             <Flame className="h-4 w-4" />
           </span>
-          <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/82">CALTRACK</span>
+          <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/82 transition">CALTRACK</span>
         </Link>
         <div className="hidden items-center gap-7 text-xs font-medium text-white/45 md:flex">
-          <a href="#ai-logging" className="transition hover:text-white">AI Logging</a>
-          <a href="#dashboard" className="transition hover:text-white">Dashboard</a>
-          <a href="#features" className="transition hover:text-white">Features</a>
+          <a href="#ai-logging" className="transition duration-300 hover:text-white hover:scale-105">AI Logging</a>
+          <a href="#dashboard" className="transition duration-300 hover:text-white hover:scale-105">Dashboard</a>
+          <a href="#features" className="transition duration-300 hover:text-white hover:scale-105">Features</a>
         </div>
         <Link
           to="/login"
-          className="rounded-full border border-white/10 bg-white/[0.08] px-4 py-2 text-xs font-semibold text-white/86 transition hover:bg-white/[0.14] hover:text-white"
+          className="rounded-full border border-white/10 bg-white/[0.08] px-4 py-2 text-xs font-semibold text-white/86 transition duration-300 hover:bg-white/[0.14] hover:text-white hover:scale-105 active:scale-95"
         >
           Login
         </Link>
@@ -351,14 +400,14 @@ function HeroSection() {
         <div className="hero-word mt-9 flex flex-col gap-3 sm:flex-row">
           <Link
             to="/login"
-            className="group inline-flex items-center justify-center gap-2 rounded-full bg-[#f4e7d1] px-6 py-3.5 text-sm font-semibold text-black shadow-[0_18px_60px_rgba(0,0,0,0.28)] transition hover:bg-amber-100"
+            className="group inline-flex items-center justify-center gap-2 rounded-full bg-[#f4e7d1] px-6 py-3.5 text-sm font-semibold text-black shadow-[0_18px_60px_rgba(0,0,0,0.28)] transition duration-300 hover:bg-amber-100 hover:shadow-[0_26px_80px_rgba(245,196,123,0.35)] active:scale-95"
           >
             Get Started
-            <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+            <ArrowRight className="h-4 w-4 transition duration-300 group-hover:translate-x-1.5" />
           </Link>
           <Link
             to="/register"
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-white/[0.09] bg-white/[0.035] px-6 py-3.5 text-sm font-semibold text-white/78 backdrop-blur-xl transition hover:bg-white/[0.08] hover:text-white"
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-white/[0.09] bg-white/[0.035] px-6 py-3.5 text-sm font-semibold text-white/78 backdrop-blur-xl transition duration-300 hover:bg-white/[0.08] hover:text-white hover:border-white/[0.14] active:scale-95"
           >
             <Play className="h-4 w-4 fill-white/80" />
             Try Demo
@@ -574,14 +623,14 @@ function FeatureHighlights() {
           {features.map((feature) => (
             <article
               key={feature.title}
-              className="feature-card group min-h-56 rounded-[1.35rem] border border-white/[0.075] bg-white/[0.032] p-6 opacity-0 backdrop-blur-xl transition duration-500 hover:-translate-y-1.5 hover:border-white/16 hover:bg-white/[0.052]"
+              className="feature-card group min-h-56 rounded-[1.35rem] border border-white/[0.075] bg-white/[0.032] p-6 opacity-0 backdrop-blur-xl transition duration-500 hover:-translate-y-2 hover:border-white/16 hover:bg-white/[0.052] hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
             >
-              <div className={`mb-6 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${feature.accent} text-black shadow-[0_16px_42px_rgba(0,0,0,0.22)]`}>
-                <feature.icon className="h-5 w-5" />
+              <div className={`mb-6 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${feature.accent} text-black shadow-[0_16px_42px_rgba(0,0,0,0.22)] transition duration-300 group-hover:shadow-[0_16px_50px_rgba(0,0,0,0.35)] group-hover:scale-110`}>
+                <feature.icon className="h-5 w-5 transition duration-300 group-hover:rotate-6" />
               </div>
-              <h3 className="text-xl font-semibold tracking-normal text-white/90">{feature.title}</h3>
-              <p className="mt-4 text-sm leading-7 text-white/43">{feature.copy}</p>
-              <div className="mt-6 h-px w-full bg-gradient-to-r from-white/14 to-transparent" />
+              <h3 className="text-xl font-semibold tracking-normal text-white/90 transition duration-300 group-hover:text-white">{feature.title}</h3>
+              <p className="mt-4 text-sm leading-7 text-white/43 transition duration-300 group-hover:text-white/55">{feature.copy}</p>
+              <div className="mt-6 h-px w-full bg-gradient-to-r from-white/14 to-transparent transition duration-300 group-hover:from-white/28" />
             </article>
           ))}
         </div>
@@ -632,10 +681,10 @@ function FinalCta() {
         </p>
         <Link
           to="/login"
-          className="mt-10 inline-flex items-center justify-center gap-2 rounded-full bg-[#f4e7d1] px-7 py-3.5 text-sm font-semibold text-black transition hover:bg-amber-100"
+          className="mt-10 inline-flex items-center justify-center gap-2 rounded-full bg-[#f4e7d1] px-7 py-3.5 text-sm font-semibold text-black shadow-[0_18px_60px_rgba(0,0,0,0.28)] transition duration-300 hover:bg-amber-100 hover:shadow-[0_26px_80px_rgba(245,196,123,0.35)] active:scale-95"
         >
           Start Tracking Today
-          <ArrowRight className="h-4 w-4" />
+          <ArrowRight className="h-4 w-4 transition duration-300 group-hover:translate-x-1.5" />
         </Link>
       </div>
     </section>
