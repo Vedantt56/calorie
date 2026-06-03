@@ -3,9 +3,34 @@ import jwt from "jsonwebtoken";
 import axios from "axios";
 
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || 'secret_key_123', {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: '30d'
   });
+};
+
+const getDefaultClientUrl = () => process.env.CLIENT_URL || "http://localhost:5173";
+const getGoogleRedirectUri = () =>
+  process.env.GOOGLE_REDIRECT_URI ||
+  `http://localhost:${process.env.PORT || 5000}/api/auth/google/callback`;
+
+const getSafeClientUrl = (candidate) => {
+  try {
+    const defaultClientUrl = getDefaultClientUrl();
+    const fallback = new URL(defaultClientUrl);
+    if (!candidate) return fallback.origin;
+
+    const url = new URL(candidate);
+    if (url.origin === fallback.origin) return url.origin;
+
+    const isLocalDev =
+      url.protocol === "http:" &&
+      ["localhost", "127.0.0.1"].includes(url.hostname) &&
+      url.port.startsWith("517");
+
+    return isLocalDev ? url.origin : fallback.origin;
+  } catch {
+    return getDefaultClientUrl();
+  }
 };
 
 const userResponse = (user) => ({
@@ -99,22 +124,22 @@ export const startGoogleAuth = (req, res) => {
     return res.status(500).json({ message: "GOOGLE_CLIENT_ID is not configured" });
   }
 
-  const redirectUri = process.env.GOOGLE_REDIRECT_URI || "http://localhost:5173/api/auth/google/callback";
+  const clientUrl = getSafeClientUrl(req.query.returnTo);
   const params = new URLSearchParams({
     client_id: process.env.GOOGLE_CLIENT_ID,
-    redirect_uri: redirectUri,
+    redirect_uri: getGoogleRedirectUri(),
     response_type: "code",
     scope: "openid email profile",
     access_type: "offline",
-    prompt: "select_account"
+    prompt: "select_account",
+    state: clientUrl
   });
 
   res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`);
 };
 
 export const handleGoogleCallback = async (req, res) => {
-  const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
-  const redirectUri = process.env.GOOGLE_REDIRECT_URI || "http://localhost:5173/api/auth/google/callback";
+  const clientUrl = getSafeClientUrl(req.query.state);
 
   try {
     if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
@@ -130,7 +155,7 @@ export const handleGoogleCallback = async (req, res) => {
       code,
       client_id: process.env.GOOGLE_CLIENT_ID,
       client_secret: process.env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: redirectUri,
+      redirect_uri: getGoogleRedirectUri(),
       grant_type: "authorization_code"
     });
 

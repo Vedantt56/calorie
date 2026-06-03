@@ -31,16 +31,25 @@ export const getLogs = async (req, res) => {
         // Get the date from query parameters (e.g., ?date=2024-05-24) or use today
         const dateParam = req.query.date;
         const targetDate = dateParam ? new Date(dateParam) : new Date();
-        
+
         // Set to start of day in UTC
         targetDate.setUTCHours(0, 0, 0, 0);
         const nextDay = new Date(targetDate);
         nextDay.setUTCDate(nextDay.getUTCDate() + 1);
 
-        const logs = await FoodLog.find({ 
+        // Get limit from query param with defaults
+        let limit = 50; // default
+        if (req.query.limit) {
+            const parsedLimit = parseInt(req.query.limit, 10);
+            if (!isNaN(parsedLimit) && parsedLimit > 0) {
+                limit = Math.min(parsedLimit, 200); // cap at 200
+            }
+        }
+
+        const logs = await FoodLog.find({
             user: req.user.id,
             createdAt: { $gte: targetDate, $lt: nextDay }
-        }).sort({ createdAt: -1 }).limit(20);
+        }).sort({ createdAt: -1 }).limit(limit);
         res.json(logs);
     } catch (err) {
         res.status(500).json({ message: err.message });

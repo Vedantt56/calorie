@@ -34,8 +34,8 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
   const [regError, setRegError] = useState('');
   const [regLoading, setRegLoading] = useState(false);
 
- const { login, register, startGoogleLogin } = useAuth();
-const navigate = useNavigate();
+  const { login, register, startGoogleLogin } = useAuth();
+  const navigate = useNavigate();
 
   // Reset errors when switching states
   useEffect(() => {
@@ -44,38 +44,38 @@ const navigate = useNavigate();
   }, [isSignUp]);
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoginLoading(true);
-  setLoginError('');
+    e.preventDefault();
+    setLoginLoading(true);
+    setLoginError('');
 
-  try {
-    await login(loginEmail, loginPassword);
+    try {
+      await login(loginEmail, loginPassword);
 
-    navigate('/dashboard');
+      navigate('/dashboard');
 
-  } catch (err: any) {
-    setLoginError(err.message || 'Invalid email or password');
-  } finally {
-    setLoginLoading(false);
-  }
-};
+    } catch (err: any) {
+      setLoginError(err.message || 'Invalid email or password');
+    } finally {
+      setLoginLoading(false);
+    }
+  };
 
   const handleRegisterSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setRegLoading(true);
-  setRegError('');
+    e.preventDefault();
+    setRegLoading(true);
+    setRegError('');
 
-  try {
-    await register(regName, regEmail, regPassword);
+    try {
+      await register(regName, regEmail, regPassword);
 
-    navigate('/dashboard');
+      navigate('/dashboard');
 
-  } catch (err: any) {
-    setRegError(err.message || 'Failed to create account');
-  } finally {
-    setRegLoading(false);
-  }
-};
+    } catch (err: any) {
+      setRegError(err.message || 'Failed to create account');
+    } finally {
+      setRegLoading(false);
+    }
+  };
 
   const handleGoogleSignInClick = async () => {
     setLoginLoading(true);
@@ -92,7 +92,7 @@ const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-[#050506] flex items-center justify-center p-4 md:p-8 relative overflow-hidden font-sans select-none selection:bg-amber-500/20">
-      
+
       {/* Cinematic Dynamic Background Atmosphere */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         {/* Warm Golden Glow Left */}
@@ -108,15 +108,15 @@ const navigate = useNavigate();
         This is our relative, overflow-hidden parent structure that has fixed, perfectly balanced proportions.
         It is completely constrained to avoid floating card escapes on desktop, and wraps into a neat form on mobile grids.
       */}
-      <div 
-        id="main-auth-card" 
+      <div
+        id="main-auth-card"
         className="relative overflow-hidden w-full max-w-md md:max-w-5xl h-auto md:h-[660px] rounded-[30px] border border-white/5 bg-[#09090b]/90 backdrop-blur-2xl shadow-[0_32px_120px_rgba(0,0,0,0.85)] z-10 flex flex-col md:flex-row"
       >
         {/* Glass Top Sheen Filter */}
         <div className="absolute inset-0 pointer-events-none rounded-[30px] bg-gradient-to-br from-white/[0.04] to-transparent [mask-image:linear-gradient(to_bottom,black,transparent_55%)] z-10" />
 
         {/* ── LEFT HALF: SIGN-IN PANEL (Absolute on desktop, adapts responsive on mobile) ── */}
-        <div 
+        <div
           className={`
             w-full md:w-1/2 h-full flex flex-col justify-center px-6 py-10 md:px-14 md:py-0
             md:absolute md:top-0 md:left-0 md:transition-all md:duration-[700ms] md:ease-[cubic-bezier(0.25,1,0.5,1)]
@@ -142,7 +142,7 @@ const navigate = useNavigate();
             </p>
 
             {/* Google Authentication Button */}
-            <button 
+            <button
               onClick={handleGoogleSignInClick}
               disabled={loginLoading || regLoading}
               className="flex items-center justify-center gap-3 w-full border border-white/5 hover:border-white/10 bg-white/[0.03] hover:bg-white/[0.06] rounded-xl py-3 text-xs font-semibold text-zinc-300 cursor-pointer transition-all duration-200 hover:scale-[1.01]"
@@ -176,7 +176,7 @@ const navigate = useNavigate();
                 <span className="absolute left-[14px] top-1/2 -translate-y-1/2 text-zinc-500 flex items-center">
                   <Mail className="w-3.5 h-3.5" />
                 </span>
-                <input 
+                <input
                   type="email"
                   required
                   placeholder="Email address"
@@ -190,7 +190,7 @@ const navigate = useNavigate();
                 <span className="absolute left-[14px] top-1/2 -translate-y-1/2 text-zinc-500 flex items-center">
                   <Lock className="w-3.5 h-3.5" />
                 </span>
-                <input 
+                <input
                   type={showPassword ? 'text' : 'password'}
                   required
                   placeholder="Password"
@@ -208,8 +208,8 @@ const navigate = useNavigate();
               </div>
 
               <div className="flex justify-end pt-1">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="text-[10px] text-zinc-600 hover:text-zinc-400 transition-colors font-medium"
                 >
                   Forgot password?
@@ -236,7 +236,7 @@ const navigate = useNavigate();
             {/* Mobile layout footer toggle */}
             <p className="mt-8 text-center text-xs text-zinc-500 md:hidden">
               Have no account?{' '}
-              <button 
+              <button
                 onClick={() => setIsSignUp(true)}
                 className="text-[#f5b35c] font-semibold cursor-pointer underline decoration-dotted underline-offset-4"
               >
@@ -247,7 +247,7 @@ const navigate = useNavigate();
         </div>
 
         {/* ── RIGHT HALF: SIGN-UP PANEL (Absolute on desktop, adapts responsive on mobile) ── */}
-        <div 
+        <div
           className={`
             w-full md:w-1/2 h-full flex flex-col justify-center px-6 py-10 md:px-14 md:py-0
             md:absolute md:top-0 md:right-0 md:transition-all md:duration-[700ms] md:ease-[cubic-bezier(0.25,1,0.5,1)]
@@ -273,7 +273,7 @@ const navigate = useNavigate();
             </p>
 
             {/* Google Authentication Button */}
-            <button 
+            <button
               onClick={handleGoogleSignInClick}
               disabled={loginLoading || regLoading}
               className="flex items-center justify-center gap-3 w-full border border-white/5 hover:border-white/10 bg-white/[0.03] hover:bg-white/[0.06] rounded-xl py-3 text-xs font-semibold text-zinc-300 cursor-pointer transition-all duration-200 hover:scale-[1.01]"
@@ -307,7 +307,7 @@ const navigate = useNavigate();
                 <span className="absolute left-[14px] top-1/2 -translate-y-1/2 text-zinc-500 flex items-center">
                   <User className="w-3.5 h-3.5" />
                 </span>
-                <input 
+                <input
                   type="text"
                   required
                   placeholder="Full name"
@@ -321,7 +321,7 @@ const navigate = useNavigate();
                 <span className="absolute left-[14px] top-1/2 -translate-y-1/2 text-zinc-500 flex items-center">
                   <Mail className="w-3.5 h-3.5" />
                 </span>
-                <input 
+                <input
                   type="email"
                   required
                   placeholder="Email address"
@@ -335,7 +335,7 @@ const navigate = useNavigate();
                 <span className="absolute left-[14px] top-1/2 -translate-y-1/2 text-zinc-500 flex items-center">
                   <Lock className="w-3.5 h-3.5" />
                 </span>
-                <input 
+                <input
                   type={showPassword ? 'text' : 'password'}
                   required
                   placeholder="Create password"
@@ -372,7 +372,7 @@ const navigate = useNavigate();
             {/* Mobile layout footer toggle */}
             <p className="mt-8 text-center text-xs text-zinc-500 md:hidden">
               Have an account?{' '}
-              <button 
+              <button
                 onClick={() => setIsSignUp(false)}
                 className="text-[#f5b35c] font-semibold cursor-pointer underline decoration-dotted underline-offset-4"
               >
@@ -414,7 +414,7 @@ const navigate = useNavigate();
 
           {/* Internal Panel Core Context */}
           <div className="relative h-full w-full z-10 flex flex-col justify-between p-12 text-center items-center">
-            
+
             {/* Header spacer */}
             <div className="flex items-center gap-1.5 justify-center">
               <Sparkles className="w-3.5 h-3.5 text-[#f5b35c]/50 animate-pulse" />

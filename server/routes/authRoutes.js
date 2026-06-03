@@ -8,11 +8,12 @@ import {
   handleGoogleCallback
 } from "../controllers/authController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
+import { validateRegister, validateLogin } from "../middleware/validation.js";
 
 const router = express.Router();
 
-router.post("/register", registerUser);
-router.post("/login", loginUser);
+router.post("/register", validateRegister, registerUser);
+router.post("/login", validateLogin, loginUser);
 router.put("/profile", authMiddleware, updateProfile);
 router.get("/me", authMiddleware, getProfile);
 router.get("/google", startGoogleAuth);

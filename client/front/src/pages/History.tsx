@@ -265,10 +265,10 @@ export default function History() {
                                   status === "empty"
                                     ? T.textMuted
                                     : status === "low"
-                                    ? "#fbbf24"
-                                    : status === "high"
-                                    ? "#f87171"
-                                    : T.amberLight,
+                                      ? "#fbbf24"
+                                      : status === "high"
+                                        ? "#f87171"
+                                        : T.amberLight,
                               }}
                             >
                               {log.calories}

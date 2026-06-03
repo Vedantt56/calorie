@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 type SideNavItemProps = {
-  icon: React.ReactNode;
+  icon: React.ReactElement<any>;
   label: string;
   active?: boolean;
   expanded: boolean;
@@ -32,7 +32,7 @@ const SideNavItem: React.FC<SideNavItemProps> = ({ icon, label, active, expanded
       whiteSpace: "nowrap",
     }}
   >
-    {React.cloneElement(icon as React.ReactElement, {
+    {React.cloneElement(icon, {
       style: { width: "16px", height: "16px", flexShrink: 0 },
     })}
     <span
@@ -52,6 +52,7 @@ interface SharedSidebarProps {
   setSidebarOpen: (open: boolean) => void;
   isMobile: boolean;
   activePage?: "dashboard" | "meals" | "progress" | "history";
+  onSettingsClick?: () => void;
 }
 
 export default function SharedSidebar({
@@ -59,6 +60,7 @@ export default function SharedSidebar({
   setSidebarOpen,
   isMobile,
   activePage,
+  onSettingsClick,
 }: SharedSidebarProps) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -142,7 +144,7 @@ export default function SharedSidebar({
           icon={<Settings />}
           label="Settings"
           expanded={sidebarOpen}
-          onClick={() => navigate("/settings")}
+          onClick={onSettingsClick || (() => navigate("/dashboard", { state: { openSettings: true } }))}
         />
       </nav>
 

@@ -30,6 +30,7 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -64,7 +65,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const startGoogleLogin = () => {
-    window.location.href = '/api/auth/google';
+    const returnTo = encodeURIComponent(window.location.origin);
+    window.location.href = `${API_BASE_URL}/api/auth/google?returnTo=${returnTo}`;
   };
 
   const updateProfile = async (profileData: any) => {

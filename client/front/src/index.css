@@ -3,27 +3,130 @@
 @import "tailwindcss";
 
 @theme {
+  /* Colors */
+  --color-amber-glow: #b05a36;
+  --color-night-sky: #2a2b2f;
+  --color-charcoal-grey: #333333;
+  --color-faded-stone: #515151;
+  --color-parchment-white: #fef9ef;
+  --color-cream-canvas: #f5eee1;
+  --color-warm-mist: #d1c9bf;
+  --color-slate-border: #808988;
+  --color-off-white: #ffffff;
+  /* Typography */
+  --font-ftbase: 'Ftbase', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-financier-display: 'Financier Display', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-fragment-mono: 'Fragment mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* Typography - Scale */
+  --text-caption: 11px;
+  --leading-caption: 1;
+  --text-body: 14px;
+  --leading-body: 1.4;
+  --tracking-body: -0.322px;
+  --text-body-lg: 16px;
+  --leading-body-lg: 1.4;
+  --tracking-body-lg: -0.368px;
+  --text-subheading: 20px;
+  --leading-subheading: 1.3;
+  --tracking-subheading: -0.46px;
+  --text-heading: 24px;
+  --leading-heading: 1.25;
+  --tracking-heading: -0.552px;
+  --text-heading-lg: 34px;
+  --leading-heading-lg: 1.15;
+  --text-display-sm: 45px;
+  --leading-display-sm: 1.11;
+  --text-display: 64px;
+  --leading-display: 1.1;
+  /* Spacing */
+  --spacing-8: 8px;
+  --spacing-16: 16px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
+  --spacing-40: 40px;
+  --spacing-48: 48px;
+  --spacing-56: 56px;
+  --spacing-64: 64px;
+  --spacing-80: 80px;
+  --spacing-240: 240px;
+  /* Border Radius */
+  --radius-sm: 2px;
+  --radius-xl: 12px;
+  --radius-3xl: 24px;
+  --radius-3xl-2: 40px;
+  --radius-full: 1440px;
+  /* Shadows */
+  --shadow-lg: rgba(0, 0, 0, 0.15) 0px 0px 20px 0px;
+  --shadow-xl: rgba(42, 43, 47, 0.1) 12px 32px 80px 0px;
+
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
+:root {
+  --theme-bg: #050506;
+  --theme-bg-soft: #070807;
+  --theme-panel: rgba(255, 255, 255, 0.035);
+  --theme-panel-strong: rgba(9, 9, 11, 0.96);
+  --theme-border: rgba(255, 255, 255, 0.08);
+  --theme-text: #f4f1ea;
+  --theme-text-soft: rgba(244, 241, 234, 0.72);
+  --theme-text-muted: rgba(255, 255, 255, 0.45);
+  --theme-text-faint: rgba(255, 255, 255, 0.24);
+  --theme-accent: #f5b35c;
+  --theme-accent-strong: #f4e7d1;
+  --theme-shadow: rgba(0, 0, 0, 0.55) 0 30px 90px;
+  --theme-font-body: var(--font-ftbase);
+  --theme-font-display: var(--font-financier-display);
+  --theme-font-mono: var(--font-fragment-mono);
+}
+
+html[data-theme="dark"] {
+  --sub: rgba(244, 241, 234, 0.68);
+  --muted: rgba(244, 241, 234, 0.44);
+}
+
+html[data-theme="light"] {
+  --theme-bg: var(--color-parchment-white);
+  --theme-bg-soft: var(--color-cream-canvas);
+  --theme-panel: rgba(255, 255, 255, 0.72);
+  --theme-panel-strong: rgba(254, 249, 239, 0.94);
+  --theme-border: rgba(128, 137, 136, 0.32);
+  --theme-text: var(--color-night-sky);
+  --theme-text-soft: var(--color-charcoal-grey);
+  --theme-text-muted: var(--color-faded-stone);
+  --theme-text-faint: rgba(81, 81, 81, 0.62);
+  --theme-accent: var(--color-amber-glow);
+  --theme-accent-strong: var(--color-amber-glow);
+  --theme-shadow: var(--shadow-xl);
+  --amber: var(--color-amber-glow);
+  --amber-lt: var(--color-amber-glow);
+  --bg: var(--color-parchment-white);
+  --text: var(--color-night-sky);
+  --sub: rgba(51, 51, 51, 0.78);
+  --muted: rgba(81, 81, 81, 0.66);
+  --card: rgba(255, 255, 255, 0.72);
+  --border: rgba(128, 137, 136, 0.32);
+}
+
 body {
-  font-family: var(--font-sans);
+  font-family: var(--theme-font-body), var(--font-sans);
   margin: 0;
-  background: #050506;
-  color: #ffffff;
+  background: var(--theme-bg);
+  color: var(--theme-text);
   text-rendering: geometricPrecision;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior-y: none;
 }
 
 html {
-  background: #050506;
+  background: var(--theme-bg);
   scroll-behavior: auto;
 }
 
 /* Lenis smooth scrolling recommended styles */
-html.lenis, html.lenis body {
+html.lenis,
+html.lenis body {
   height: auto;
 }
 
@@ -280,17 +383,20 @@ a {
   top: 24%;
   animation-delay: 0s;
 }
+
 .data-constellation span:nth-child(2) {
   right: 16%;
   top: 18%;
   background: rgba(141, 220, 236, 0.55);
   animation-delay: 0.8s;
 }
+
 .data-constellation span:nth-child(3) {
   left: 22%;
   bottom: 18%;
   animation-delay: 1.6s;
 }
+
 .data-constellation span:nth-child(4) {
   right: 12%;
   bottom: 28%;
@@ -332,30 +438,37 @@ a {
   from {
     transform: translate3d(-2%, -1%, 0) rotate(0deg) scale(1);
   }
+
   50% {
     transform: translate3d(1%, 1%, 0) rotate(5deg) scale(1.03);
   }
+
   to {
     transform: translate3d(2%, 2%, 0) rotate(10deg) scale(1.05);
   }
 }
 
 @keyframes scanPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.28;
     transform: scale(0.92) rotate(12deg);
     filter: drop-shadow(0 0 8px rgba(255, 196, 118, 0));
   }
+
   25% {
     opacity: 0.54;
     transform: scale(0.98) rotate(15deg);
     filter: drop-shadow(0 0 12px rgba(255, 196, 118, 0.3));
   }
+
   50% {
     opacity: 0.88;
     transform: scale(1.06) rotate(18deg);
     filter: drop-shadow(0 0 18px rgba(255, 196, 118, 0.5));
   }
+
   75% {
     opacity: 0.54;
     transform: scale(0.98) rotate(15deg);
@@ -364,21 +477,28 @@ a {
 }
 
 @keyframes scanSweep {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateX(-200%) rotate(18deg);
     opacity: 0;
   }
+
   10% {
     opacity: 0.4;
   }
-  30%, 70% {
+
+  30%,
+  70% {
     opacity: 0.85;
   }
+
   50% {
     transform: translateX(0%) rotate(18deg);
     opacity: 0.95;
     filter: drop-shadow(0 0 16px rgba(255, 210, 150, 0.6));
   }
+
   90% {
     opacity: 0.4;
   }
@@ -388,9 +508,11 @@ a {
   from {
     transform: translateY(-12px) translateX(-2px) rotate(-14deg);
   }
+
   50% {
     transform: translateY(2px) translateX(1px) rotate(-10deg);
   }
+
   to {
     transform: translateY(16px) translateX(-1px) rotate(-7deg);
   }
@@ -437,10 +559,13 @@ a {
 }
 
 @keyframes constellationTwinkle {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.6;
     filter: drop-shadow(0 0 4px rgba(255, 196, 118, 0.3));
   }
+
   50% {
     opacity: 1;
     filter: drop-shadow(0 0 12px rgba(255, 196, 118, 0.8));
@@ -448,9 +573,12 @@ a {
 }
 
 @keyframes planetFloat {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: rotate(-8deg) translateY(-4px);
   }
+
   50% {
     transform: rotate(-6deg) translateY(4px);
   }
@@ -460,15 +588,19 @@ a {
   from {
     transform: rotate(-8deg) scale(1);
   }
+
   to {
     transform: rotate(352deg) scale(1);
   }
 }
 
 @keyframes glowPulse {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 46px 140px rgba(0, 0, 0, 0.58), inset 0 1px 0 rgba(255, 255, 255, 0.18);
   }
+
   50% {
     box-shadow: 0 46px 140px rgba(0, 0, 0, 0.58), inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 0 40px rgba(255, 196, 118, 0.15);
   }
@@ -480,6 +612,7 @@ a {
     filter: blur(24px);
     text-shadow: 0 0 0 rgba(255, 196, 118, 0);
   }
+
   to {
     opacity: 1;
     filter: blur(0px);
@@ -492,6 +625,7 @@ a {
     opacity: 0;
     transform: translateY(120px) scale(0.85) skewY(2deg);
   }
+
   to {
     opacity: 1;
     transform: translateY(0px) scale(1) skewY(0deg);
@@ -499,9 +633,12 @@ a {
 }
 
 @keyframes featureCardFloat {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-6px);
   }
@@ -533,11 +670,399 @@ a {
   animation: dashboardFadeIn 360ms ease-out both;
 }
 
+.theme-toggle {
+  position: fixed;
+  top: var(--spacing-16);
+  right: var(--spacing-16);
+  z-index: 1000;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--theme-border);
+  border-radius: var(--radius-xl);
+  background: color-mix(in srgb, var(--theme-panel-strong) 88%, transparent);
+  color: var(--theme-accent);
+  box-shadow: var(--theme-shadow);
+  backdrop-filter: blur(18px);
+  cursor: pointer;
+  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--theme-accent) 45%, var(--theme-border));
+}
+
+.theme-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+html[data-theme="light"] body,
+html[data-theme="light"] #root {
+  background: var(--theme-bg);
+  color: var(--theme-text);
+}
+
+html[data-theme="light"] [class*="bg-\\[\\#050506\\]"],
+html[data-theme="light"] [class*="bg-\\[\\#09090b\\]"],
+html[data-theme="light"] [class*="bg-\\[\\#0e0b06\\]"],
+html[data-theme="light"] [style*="background: rgb(5, 5, 6)"],
+html[data-theme="light"] [style*="background: #050506"] {
+  background: var(--theme-bg) !important;
+}
+
+html[data-theme="light"] .dash-root,
+html[data-theme="light"] .my-meals-root,
+html[data-theme="light"] .progress-root,
+html[data-theme="light"] main[style*="background"],
+html[data-theme="light"] .logging-section,
+html[data-theme="light"] .dashboard-section,
+html[data-theme="light"] .features-section,
+html[data-theme="light"] .impact-section,
+html[data-theme="light"] .final-cta {
+  background: var(--theme-bg) !important;
+  color: var(--theme-text) !important;
+  font-family: var(--theme-font-body), var(--font-sans) !important;
+}
+
+html[data-theme="light"] .logging-section,
+html[data-theme="light"] .features-section {
+  background: var(--theme-bg-soft) !important;
+}
+
+html[data-theme="light"] .shared-sidebar,
+html[data-theme="light"] .mobile-nav,
+html[data-theme="light"] .lp-nav,
+html[data-theme="light"] #main-auth-card,
+html[data-theme="light"] .log-modal,
+html[data-theme="light"] .water-overlay-panel,
+html[data-theme="light"] .water-card,
+html[data-theme="light"] .card,
+html[data-theme="light"] .hydration-card,
+html[data-theme="light"] .meals-panel,
+html[data-theme="light"] .date-nav,
+html[data-theme="light"] .search-container,
+html[data-theme="light"] .hero-card,
+html[data-theme="light"] .hero-metric-card,
+html[data-theme="light"] .hero-side-card,
+html[data-theme="light"] .macro-donut-card,
+html[data-theme="light"] .support-card,
+html[data-theme="light"] .weekly-card,
+html[data-theme="light"] .recent-card,
+html[data-theme="light"] .product-card,
+html[data-theme="light"] .logger-card,
+html[data-theme="light"] .dash-goal-card,
+html[data-theme="light"] .dash-pattern-card,
+html[data-theme="light"] .dash-mockup,
+html[data-theme="light"] .feature-card,
+html[data-theme="light"] .stat-card,
+html[data-theme="light"] .insight-chip,
+html[data-theme="light"] .hero-badge,
+html[data-theme="light"] .ticker-wrap {
+  background: var(--theme-panel) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text) !important;
+  box-shadow: var(--theme-shadow) !important;
+}
+
+html[data-theme="light"] .water-main-panel,
+html[data-theme="light"] .water-detail-group,
+html[data-theme="light"] .water-metric-card,
+html[data-theme="light"] .water-timeline-item,
+html[data-theme="light"] .hydration-chart-card,
+html[data-theme="light"] .log-item,
+html[data-theme="light"] .recent-item,
+html[data-theme="light"] .weekly-summary > div,
+html[data-theme="light"] .dm-ring-wrap,
+html[data-theme="light"] .dm-macro-row,
+html[data-theme="light"] .dm-footer-cell,
+html[data-theme="light"] .macro-card,
+html[data-theme="light"] .logger-input-box,
+html[data-theme="light"] .logger-process-box,
+html[data-theme="light"] .dgc-item,
+html[data-theme="light"] .meals-empty-state,
+html[data-theme="light"] .meal-group-header {
+  background: rgba(255, 255, 255, 0.58) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text) !important;
+}
+
+html[data-theme="light"] .header-title,
+html[data-theme="light"] .hero-title,
+html[data-theme="light"] .section-h2,
+html[data-theme="light"] .hero-h1,
+html[data-theme="light"] .cta-h2,
+html[data-theme="light"] .water-card-title,
+html[data-theme="light"] .water-summary-number,
+html[data-theme="light"] .water-metric-value,
+html[data-theme="light"] .water-detail-title,
+html[data-theme="light"] .date-display,
+html[data-theme="light"] .macro-donut-label,
+html[data-theme="light"] .recent-title,
+html[data-theme="light"] .logger-name,
+html[data-theme="light"] .dgc-num,
+html[data-theme="light"] .dpc-title,
+html[data-theme="light"] .dm-title,
+html[data-theme="light"] .dm-ring-val,
+html[data-theme="light"] .dm-macro-name,
+html[data-theme="light"] .dm-footer-val,
+html[data-theme="light"] .fc-title,
+html[data-theme="light"] .stat-number,
+html[data-theme="light"] .nav-wordmark,
+html[data-theme="light"] [class*="text-zinc-100"],
+html[data-theme="light"] [class*="text-zinc-200"],
+html[data-theme="light"] [style*="color: rgb(244, 241, 234)"],
+html[data-theme="light"] [style*="color: #f4f1ea"] {
+  color: var(--theme-text) !important;
+}
+
+html[data-theme="light"] .header-sub,
+html[data-theme="light"] .subheading,
+html[data-theme="light"] .small-label,
+html[data-theme="light"] .date-pill,
+html[data-theme="light"] .nav-btn,
+html[data-theme="light"] .filter-btn,
+html[data-theme="light"] .hero-copy,
+html[data-theme="light"] .hero-note,
+html[data-theme="light"] .support-note,
+html[data-theme="light"] .section-p,
+html[data-theme="light"] .section-sub,
+html[data-theme="light"] .bar-label,
+html[data-theme="light"] .recent-sub,
+html[data-theme="light"] .macro-donut-sub,
+html[data-theme="light"] .water-meta-text,
+html[data-theme="light"] .water-summary-note,
+html[data-theme="light"] .water-metric-label,
+html[data-theme="light"] .water-ring-sub,
+html[data-theme="light"] .water-quiet-hours,
+html[data-theme="light"] .hydration-message,
+html[data-theme="light"] .logger-sub,
+html[data-theme="light"] .logger-live-badge,
+html[data-theme="light"] .logger-input-label,
+html[data-theme="light"] .logger-process-labels,
+html[data-theme="light"] .mc-unit,
+html[data-theme="light"] .dgc-sub,
+html[data-theme="light"] .dgc-text,
+html[data-theme="light"] .dpc-copy,
+html[data-theme="light"] .dm-eyebrow,
+html[data-theme="light"] .dm-ring-unit,
+html[data-theme="light"] .dm-macro-val,
+html[data-theme="light"] .dm-footer-label,
+html[data-theme="light"] .fc-copy,
+html[data-theme="light"] .stat-label,
+html[data-theme="light"] .ticker-item,
+html[data-theme="light"] .nav-links a,
+html[data-theme="light"] [class*="text-zinc-400"],
+html[data-theme="light"] [class*="text-zinc-500"],
+html[data-theme="light"] [class*="text-zinc-600"],
+html[data-theme="light"] [style*="rgba(255, 255, 255, 0.45)"],
+html[data-theme="light"] [style*="rgba(255,255,255,0.45)"],
+html[data-theme="light"] [style*="rgba(255, 255, 255, 0.24)"],
+html[data-theme="light"] [style*="rgba(255,255,255,0.24)"] {
+  color: var(--theme-text-muted) !important;
+}
+
+html[data-theme="light"] .section-eyebrow,
+html[data-theme="light"] .hero-h1 em,
+html[data-theme="light"] .goal-label,
+html[data-theme="light"] .mobile-nav-btn.active,
+html[data-theme="light"] .filter-btn.active,
+html[data-theme="light"] .hero-badge,
+html[data-theme="light"] .stat-suffix,
+html[data-theme="light"] [class*="text-\\[\\#f5b35c\\]"] {
+  color: var(--theme-accent) !important;
+}
+
+html[data-theme="light"] input,
+html[data-theme="light"] textarea,
+html[data-theme="light"] .search-input,
+html[data-theme="light"] .water-goal-input,
+html[data-theme="light"] .water-custom-input,
+html[data-theme="light"] .water-quiet-input {
+  background: rgba(255, 255, 255, 0.66) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text) !important;
+}
+
+html[data-theme="light"] input::placeholder,
+html[data-theme="light"] textarea::placeholder,
+html[data-theme="light"] .search-input::placeholder {
+  color: var(--theme-text-faint) !important;
+}
+
+html[data-theme="light"] .btn-primary,
+html[data-theme="light"] .log-btn,
+html[data-theme="light"] .mobile-fab,
+html[data-theme="light"] .water-action-primary,
+html[data-theme="light"] .water-goal-save,
+html[data-theme="light"] [class*="bg-\\[\\#f4e7d1\\]"] {
+  background: var(--theme-accent) !important;
+  color: var(--color-off-white) !important;
+  border-color: var(--theme-accent) !important;
+}
+
+html[data-theme="light"] .btn-secondary,
+html[data-theme="light"] .nav-cta,
+html[data-theme="light"] .icon-btn,
+html[data-theme="light"] .mobile-menu-btn,
+html[data-theme="light"] .water-close-btn,
+html[data-theme="light"] .water-goal-btn,
+html[data-theme="light"] .water-action-btn {
+  background: rgba(255, 255, 255, 0.54) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text) !important;
+}
+
+html[data-theme="light"] .landing-grid {
+  background-image:
+    linear-gradient(rgba(81, 81, 81, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(81, 81, 81, 0.08) 1px, transparent 1px);
+}
+
+html[data-theme="light"] .atmosphere {
+  background:
+    linear-gradient(120deg, rgba(176, 90, 54, 0.12), transparent 34%),
+    linear-gradient(180deg, var(--color-parchment-white) 0%, var(--color-cream-canvas) 100%);
+}
+
+html[data-theme="light"] .grain-overlay,
+html[data-theme="light"] .cinematic-vignette,
+html[data-theme="light"] .depth-fog {
+  opacity: 0.018;
+}
+
+html[data-theme="light"] .atm-orb {
+  filter: blur(110px) saturate(0.75);
+}
+
+html[data-theme="light"] .hero-img-overlay,
+html[data-theme="light"] .logging-img-overlay {
+  background: linear-gradient(160deg, rgba(254, 249, 239, 0.05), rgba(42, 43, 47, 0.28)) !important;
+}
+
+html[data-theme="light"] .hero-img-badge,
+html[data-theme="light"] .logging-img-tag {
+  background: rgba(254, 249, 239, 0.78) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text) !important;
+}
+
+html[data-theme="light"] .water-overlay {
+  background: rgba(245, 238, 225, 0.72) !important;
+}
+
+html[data-theme="light"] .notif-dot {
+  border-color: var(--theme-bg) !important;
+}
+
+html[data-theme="light"] .theme-toggle {
+  background: rgba(254, 249, 239, 0.9);
+}
+
+html[data-theme="dark"] .header-sub,
+html[data-theme="dark"] .date-pill,
+html[data-theme="dark"] .small-label,
+html[data-theme="dark"] .hero-copy,
+html[data-theme="dark"] .hero-note,
+html[data-theme="dark"] .support-note,
+html[data-theme="dark"] .section-p,
+html[data-theme="dark"] .section-sub,
+html[data-theme="dark"] .bar-label,
+html[data-theme="dark"] .recent-sub,
+html[data-theme="dark"] .macro-donut-sub,
+html[data-theme="dark"] .water-card-label,
+html[data-theme="dark"] .water-ring-sub,
+html[data-theme="dark"] .water-summary-note,
+html[data-theme="dark"] .water-meta-text,
+html[data-theme="dark"] .water-metric-label,
+html[data-theme="dark"] .water-quiet-hours,
+html[data-theme="dark"] .logger-sub,
+html[data-theme="dark"] .logger-input-label,
+html[data-theme="dark"] .logger-process-labels,
+html[data-theme="dark"] .dgc-sub,
+html[data-theme="dark"] .dpc-copy,
+html[data-theme="dark"] .fc-copy,
+html[data-theme="dark"] .stat-label,
+html[data-theme="dark"] [style*="rgba(255,255,255,0.24)"],
+html[data-theme="dark"] [style*="rgba(255,255,255,0.3)"],
+html[data-theme="dark"] [style*="rgba(255,255,255,0.35)"],
+html[data-theme="dark"] [style*="rgba(255,255,255,0.4)"],
+html[data-theme="dark"] [style*="rgba(255,255,255,0.45)"],
+html[data-theme="dark"] [style*="rgba(244,241,234,0.28)"] {
+  color: rgba(244, 241, 234, 0.68) !important;
+}
+
+html[data-theme="dark"] [style*="rgba(255,255,255,0.22)"] {
+  color: rgba(244, 241, 234, 0.52) !important;
+}
+
+html[data-theme="dark"] [style*="rgba(255,255,255,0.8)"],
+html[data-theme="dark"] .hydration-message,
+html[data-theme="dark"] .hero-sub {
+  color: rgba(244, 241, 234, 0.86) !important;
+}
+
+html[data-theme="light"] .hero-sub,
+html[data-theme="light"] .cta-p,
+html[data-theme="light"] [style*="rgba(255,255,255,0.4)"],
+html[data-theme="light"] [style*="rgba(244,241,234,0.28)"] {
+  color: var(--theme-text-soft) !important;
+}
+
+html[data-theme="light"] [style*="rgba(255,255,255,0.2)"],
+html[data-theme="light"] [style*="rgba(255,255,255,0.22)"],
+html[data-theme="light"] [style*="rgba(255,255,255,0.24)"],
+html[data-theme="light"] [style*="rgba(255,255,255,0.3)"],
+html[data-theme="light"] [style*="rgba(255,255,255,0.35)"],
+html[data-theme="light"] [style*="rgba(255,255,255,0.45)"],
+html[data-theme="light"] [style*="rgba(255,255,255,0.5)"],
+html[data-theme="light"] [style*="rgba(255,255,255,0.55)"],
+html[data-theme="light"] [style*="rgba(255,255,255,0.65)"],
+html[data-theme="light"] [style*="rgba(244,241,234,0.65)"],
+html[data-theme="light"] [style*="rgba(244,241,234,0.72)"],
+html[data-theme="light"] [style*="rgba(244,241,234,0.75)"] {
+  color: var(--theme-text-muted) !important;
+}
+
+html[data-theme="light"] [style*="rgba(255,255,255,0.72)"],
+html[data-theme="light"] [style*="rgba(255,255,255,0.75)"],
+html[data-theme="light"] [style*="rgba(255,255,255,0.8)"],
+html[data-theme="light"] [style*="rgba(255,255,255,0.85)"],
+html[data-theme="light"] [style*="rgba(255,255,255,0.88)"],
+html[data-theme="light"] [style*="rgba(255,255,255,.72)"],
+html[data-theme="light"] [style*="rgba(255,255,255,.75)"],
+html[data-theme="light"] [style*="rgba(255,255,255,.8)"],
+html[data-theme="light"] [style*="rgba(255,255,255,.85)"],
+html[data-theme="light"] [style*="rgba(255,255,255,.88)"] {
+  color: var(--theme-text) !important;
+}
+
+html[data-theme="light"] .macro-card,
+html[data-theme="light"] .macro-donut-card,
+html[data-theme="light"] .dm-macro-row,
+html[data-theme="light"] .hero-pill,
+html[data-theme="light"] .date-pill,
+html[data-theme="light"] .icon-btn,
+html[data-theme="light"] .mobile-menu-btn,
+html[data-theme="light"] .nav-btn {
+  box-shadow: rgba(42, 43, 47, 0.06) 0 8px 24px !important;
+}
+
+html[data-theme="light"] .card-glow,
+html[data-theme="light"] .hydration-glow,
+html[data-theme="light"] .modal-glow,
+html[data-theme="light"] .water-card-glow {
+  opacity: 0.22;
+}
+
 @keyframes dashboardFadeIn {
   from {
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -545,6 +1070,7 @@ a {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
