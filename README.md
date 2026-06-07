@@ -6,7 +6,7 @@ Built with React, TypeScript, Node.js, MongoDB, and AI-powered food analysis, Ca
 
 ---
 
-## 🚀 Features
+### 🚀 Features
 
 ### 🤖 AI Meal Logging
 
