@@ -1,6 +1,6 @@
     # 🥗 CalTrack AI
 
-CalTrack AI is a full-stack AI-powered nutrition tracking platform that helps users log meals effortlessly using natural language. Instead of manually searching for foods and entering macros, users can simply describe what they ate, and the AI automatically extracts food items, estimates nutritional values, and updates daily calorie and macro goals.
+CalTrack is a full-stack AI-powered nutrition tracking platform that helps users log meals effortlessly using natural language. Instead of manually searching for foods and entering macros, users can simply describe what they ate, and the AI automatically extracts food items, estimates nutritional values, and updates daily calorie and macro goals.
 
 Built with React, TypeScript, Node.js, MongoDB, and AI-powered food analysis, CalTrack provides a modern and intuitive approach to health and nutrition tracking.
 
