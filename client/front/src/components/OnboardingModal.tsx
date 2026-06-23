@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { useAuth } from '../context/AuthContext';
 import { Scale, Ruler, User as UserIcon, Activity, Target, ChevronRight, X, Loader2 } from 'lucide-react';
+import './OnboardingModal.css';
 
 export default function OnboardingModal({
   open,
@@ -34,18 +35,16 @@ export default function OnboardingModal({
       height: user?.height ? String(user.height) : '',
       weight: user?.weight ? String(user.weight) : '',
       gender: user?.gender || 'male',
-      activityLevel: user?.activityLevel || 1.2,
+      activityLevel: normalizeActivityLevel(user?.activityLevel),
       goal: user?.goal || 'maintenance'
     });
   }, [open, user]);
 
   const palOptions = [
-    { label: "Little/No Exercise", value: 1.2 },
-    { label: "Light (1-2x/week)", value: 1.4 },
-    { label: "Moderate (2-3x/week)", value: 1.6 },
-    { label: "Hard (3-5x/week)", value: 1.75 },
-    { label: "Very Hard (Physical Job)", value: 2.0 },
-    { label: "Athlete", value: 2.4 },
+    { label: "No Workout", value: 1.2 },
+    { label: "Light Workout (1-3 days/week)", value: 1.4 },
+    { label: "Moderate Workout (3-5 days/week)", value: 1.6 },
+    { label: "Heavy Workout (6+ days/week)", value: 1.75 },
   ];
 
   const goals = [
@@ -75,15 +74,18 @@ export default function OnboardingModal({
     if (formData.goal === 'bulking') targetCals += 400;
     if (formData.goal === 'cutting') targetCals -= 500;
 
-    // Ratios (P/C/F)
-    let pRatio = 0.3, cRatio = 0.4, fRatio = 0.3;
-    if (formData.goal === 'recomp') { pRatio = 0.4; cRatio = 0.35; fRatio = 0.25; }
+    const macroFactors = getMacroFactors(pal);
+    const protein = Math.round(w * macroFactors.proteinPerKg);
+    const fat = Math.round(w * macroFactors.fatPerKg);
+    const proteinCalories = protein * 4;
+    const fatCalories = fat * 9;
+    const remainingCalories = Math.max(0, targetCals - proteinCalories - fatCalories);
 
     return {
       calories: targetCals,
-      protein: Math.round((targetCals * pRatio) / 4),
-      carbs: Math.round((targetCals * cRatio) / 4),
-      fat: Math.round((targetCals * fRatio) / 9)
+      protein,
+      carbs: Math.round(remainingCalories / 4),
+      fat
     };
   };
 
@@ -111,30 +113,30 @@ export default function OnboardingModal({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100]" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-[3rem] shadow-2xl z-[101] w-[90vw] max-w-2xl p-8 overflow-hidden">
+        <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] onboarding-overlay" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-[3rem] shadow-2xl z-[101] w-[90vw] max-w-2xl p-8 overflow-hidden onboarding-modal">
 
           {/* Header */}
-          <div className="flex justify-between items-center mb-10">
+          <div className="flex justify-between items-center mb-10 onboarding-modal-header">
             <div>
               <span className="text-[10px] font-black text-[#8e85fd] uppercase tracking-[0.2em] mb-1 block">Step {step} of 3</span>
-              <h2 className="text-3xl font-black text-zinc-900 tracking-tight">
+              <Dialog.Title className="text-3xl font-black text-zinc-900 tracking-tight onboarding-modal-title">
                 {mode === 'settings' ? 'Update Settings' : 'Personalize Your Goal'}
-              </h2>
+              </Dialog.Title>
             </div>
-            <Dialog.Close className="p-2 hover:bg-zinc-100 rounded-full transition-colors">
+            <Dialog.Close className="p-2 hover:bg-zinc-100 rounded-full transition-colors onboarding-modal-close">
               <X className="w-6 h-6 text-zinc-400" />
             </Dialog.Close>
           </div>
 
-          <div className="min-h-[400px]">
+          <div className="min-h-[400px] onboarding-modal-body">
             {step === 1 && (
               <div className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500">
-                <p className="text-zinc-500 mb-8 font-medium italic">
+                <Dialog.Description className="text-zinc-500 mb-8 font-medium italic onboarding-modal-description">
                   {mode === 'settings'
                     ? 'Adjust your details to refresh your daily calorie and macro targets.'
                     : 'We need a few details to calculate your perfect macro breakdown.'}
-                </p>
+                </Dialog.Description>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -295,10 +297,25 @@ export default function OnboardingModal({
 }
 
 function optLabel(val: number) {
-  if (val === 1.2) return 'Sedentary';
-  if (val === 1.4) return 'Active';
-  if (val === 1.6) return 'Balanced';
-  if (val === 1.75) return 'Fitness';
-  if (val === 2.0) return 'Physical';
-  return 'Elite';
+  if (val === 1.2) return 'No Workout';
+  if (val === 1.4) return 'Light';
+  if (val === 1.6) return 'Moderate';
+  return 'Heavy';
+}
+
+function getMacroFactors(activityLevel: number) {
+  const normalizedActivityLevel = normalizeActivityLevel(activityLevel);
+
+  if (normalizedActivityLevel === 1.2) return { proteinPerKg: 1.3, fatPerKg: 0.8 };
+  if (normalizedActivityLevel === 1.4) return { proteinPerKg: 1.6, fatPerKg: 0.8 };
+  if (normalizedActivityLevel === 1.6) return { proteinPerKg: 1.8, fatPerKg: 0.9 };
+  return { proteinPerKg: 2.1, fatPerKg: 1.0 };
+}
+
+function normalizeActivityLevel(activityLevel?: number) {
+  if (!activityLevel) return 1.2;
+  if (activityLevel <= 1.2) return 1.2;
+  if (activityLevel <= 1.4) return 1.4;
+  if (activityLevel <= 1.6) return 1.6;
+  return 1.75;
 }
