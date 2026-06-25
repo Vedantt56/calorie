@@ -113,13 +113,17 @@ export default function OnboardingModal({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
+        <div className="onboarding-portal">
         <Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] onboarding-overlay" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-[3rem] shadow-2xl z-[101] w-[90vw] max-w-2xl p-8 overflow-hidden onboarding-modal">
+        <Dialog.Content className="bg-white rounded-[3rem] shadow-2xl z-[101] w-[90vw] max-w-2xl p-8 overflow-hidden onboarding-modal">
+          <div className="onboarding-modal-glow onboarding-modal-glow-amber" aria-hidden="true" />
+          <div className="onboarding-modal-glow onboarding-modal-glow-blue" aria-hidden="true" />
+          <div className="onboarding-modal-grain" aria-hidden="true" />
 
           {/* Header */}
           <div className="flex justify-between items-center mb-10 onboarding-modal-header">
             <div>
-              <span className="text-[10px] font-black text-[#8e85fd] uppercase tracking-[0.2em] mb-1 block">Step {step} of 3</span>
+              <span className="text-[10px] font-black text-[#8e85fd] uppercase tracking-[0.2em] mb-1 block onboarding-step-label">Step {step} of 3</span>
               <Dialog.Title className="text-3xl font-black text-zinc-900 tracking-tight onboarding-modal-title">
                 {mode === 'settings' ? 'Update Settings' : 'Personalize Your Goal'}
               </Dialog.Title>
@@ -141,7 +145,7 @@ export default function OnboardingModal({
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-zinc-400 uppercase ml-2">Basics</label>
-                    <div className="relative group">
+                    <div className="relative group onboarding-input-shell">
                       <Scale className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-300 group-focus-within:text-[#8e85fd] transition-colors" />
                       <input
                         type="number" placeholder="Weight (Kg)"
@@ -153,7 +157,7 @@ export default function OnboardingModal({
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-zinc-400 uppercase ml-2 opacity-0">Height</label>
-                    <div className="relative group">
+                    <div className="relative group onboarding-input-shell">
                       <Ruler className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-300 group-focus-within:text-[#8e85fd] transition-colors" />
                       <input
                         type="number" placeholder="Height (cm)"
@@ -167,7 +171,7 @@ export default function OnboardingModal({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <div className="relative group">
+                    <div className="relative group onboarding-input-shell">
                       <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-300 group-focus-within:text-[#8e85fd] transition-colors" />
                       <input
                         type="number" placeholder="Age"
@@ -177,14 +181,14 @@ export default function OnboardingModal({
                       />
                     </div>
                   </div>
-                  <div className="flex p-1 bg-zinc-50 rounded-2xl border-2 border-zinc-100">
+                  <div className="flex p-1 bg-zinc-50 rounded-2xl border-2 border-zinc-100 onboarding-segmented">
                     <button
                       onClick={() => setFormData({ ...formData, gender: 'male' })}
-                      className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all ${formData.gender === 'male' ? 'bg-white shadow-sm text-zinc-900' : 'text-zinc-400'}`}
+                      className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all onboarding-segment ${formData.gender === 'male' ? 'is-active bg-white shadow-sm text-zinc-900' : 'text-zinc-400'}`}
                     >Male</button>
                     <button
                       onClick={() => setFormData({ ...formData, gender: 'female' })}
-                      className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all ${formData.gender === 'female' ? 'bg-white shadow-sm text-zinc-900' : 'text-zinc-400'}`}
+                      className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all onboarding-segment ${formData.gender === 'female' ? 'is-active bg-white shadow-sm text-zinc-900' : 'text-zinc-400'}`}
                     >Female</button>
                   </div>
                 </div>
@@ -192,7 +196,7 @@ export default function OnboardingModal({
                 <button
                   onClick={() => setStep(2)}
                   disabled={!formData.weight || !formData.height || !formData.age}
-                  className="w-full bg-[#1c1c1e] text-white py-5 rounded-2xl font-black text-lg flex items-center justify-center gap-3 hover:bg-black transition-all disabled:opacity-50 mt-8"
+                  className="w-full bg-[#1c1c1e] text-white py-5 rounded-2xl font-black text-lg flex items-center justify-center gap-3 hover:bg-black transition-all disabled:opacity-50 mt-8 onboarding-primary-button"
                 >
                   Continue <ChevronRight className="w-5 h-5" />
                 </button>
@@ -210,7 +214,7 @@ export default function OnboardingModal({
                       <button
                         key={opt.value}
                         onClick={() => setFormData({ ...formData, activityLevel: opt.value })}
-                        className={`p-4 rounded-2xl border-2 transition-all text-left group ${formData.activityLevel === opt.value ? 'border-[#8e85fd] bg-[#8e85fd]/5' : 'border-zinc-100 hover:border-zinc-200 bg-zinc-50'}`}
+                        className={`p-4 rounded-2xl border-2 transition-all text-left group onboarding-option ${formData.activityLevel === opt.value ? 'is-active border-[#8e85fd] bg-[#8e85fd]/5' : 'border-zinc-100 hover:border-zinc-200 bg-zinc-50'}`}
                       >
                         <span className={`block text-xs font-black uppercase transition-colors ${formData.activityLevel === opt.value ? 'text-[#8e85fd]' : 'text-zinc-400 group-hover:text-zinc-500'}`}>{optLabel(opt.value)}</span>
                         <span className={`text-sm font-bold ${formData.activityLevel === opt.value ? 'text-zinc-900' : 'text-zinc-500'}`}>{opt.label}</span>
@@ -228,7 +232,7 @@ export default function OnboardingModal({
                       <button
                         key={goal.id}
                         onClick={() => setFormData({ ...formData, goal: goal.id as any })}
-                        className={`p-4 rounded-2xl border-2 transition-all text-left ${formData.goal === goal.id ? 'border-[#adff00] bg-[#adff00]/5' : 'border-zinc-100 hover:border-zinc-200 bg-zinc-50'}`}
+                        className={`p-4 rounded-2xl border-2 transition-all text-left onboarding-option onboarding-goal-option ${formData.goal === goal.id ? 'is-active border-[#adff00] bg-[#adff00]/5' : 'border-zinc-100 hover:border-zinc-200 bg-zinc-50'}`}
                       >
                         <span className="block text-sm font-black text-zinc-900">{goal.label}</span>
                         <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">{goal.description}</span>
@@ -238,10 +242,10 @@ export default function OnboardingModal({
                 </div>
 
                 <div className="flex gap-4 mt-10">
-                  <button onClick={() => setStep(1)} className="flex-1 py-5 rounded-2xl font-bold text-zinc-500 hover:bg-zinc-100 transition-all">Back</button>
+                  <button onClick={() => setStep(1)} className="flex-1 py-5 rounded-2xl font-bold text-zinc-500 hover:bg-zinc-100 transition-all onboarding-secondary-button">Back</button>
                   <button
                     onClick={() => setStep(3)}
-                    className="flex-[2] bg-[#1c1c1e] text-white py-5 rounded-2xl font-black text-lg flex items-center justify-center gap-3 hover:bg-black transition-all"
+                    className="flex-[2] bg-[#1c1c1e] text-white py-5 rounded-2xl font-black text-lg flex items-center justify-center gap-3 hover:bg-black transition-all onboarding-primary-button"
                   >
                     Calculate Plan <ChevronRight className="w-5 h-5" />
                   </button>
@@ -262,26 +266,26 @@ export default function OnboardingModal({
                 </div>
 
                 <div className="grid grid-cols-3 gap-3 w-full max-w-sm">
-                  <div className="bg-zinc-50 p-4 rounded-3xl border border-zinc-100">
+                  <div className="bg-zinc-50 p-4 rounded-3xl border border-zinc-100 onboarding-result-card">
                     <span className="block text-[10px] font-black text-orange-500 uppercase mb-1">Protein</span>
                     <span className="text-xl font-bold text-zinc-900">{results.protein}g</span>
                   </div>
-                  <div className="bg-zinc-50 p-4 rounded-3xl border border-zinc-100">
+                  <div className="bg-zinc-50 p-4 rounded-3xl border border-zinc-100 onboarding-result-card">
                     <span className="block text-[10px] font-black text-green-500 uppercase mb-1">Carbs</span>
                     <span className="text-xl font-bold text-zinc-900">{results.carbs}g</span>
                   </div>
-                  <div className="bg-zinc-50 p-4 rounded-3xl border border-zinc-100">
+                  <div className="bg-zinc-50 p-4 rounded-3xl border border-zinc-100 onboarding-result-card">
                     <span className="block text-[10px] font-black text-blue-500 uppercase mb-1">Fat</span>
                     <span className="text-xl font-bold text-zinc-900">{results.fat}g</span>
                   </div>
                 </div>
 
                 <div className="flex gap-4 w-full mt-10">
-                  <button onClick={() => setStep(2)} className="flex-1 py-5 rounded-2xl font-bold text-zinc-500 hover:bg-zinc-100 transition-all">Adjust Stats</button>
+                  <button onClick={() => setStep(2)} className="flex-1 py-5 rounded-2xl font-bold text-zinc-500 hover:bg-zinc-100 transition-all onboarding-secondary-button">Adjust Stats</button>
                   <button
                     onClick={handleSave}
                     disabled={loading}
-                    className="flex-[2] bg-[#adff00] text-black py-5 rounded-2xl font-black text-lg flex items-center justify-center gap-3 hover:bg-[#99e600] transition-all shadow-xl shadow-[#adff00]/20"
+                    className="flex-[2] bg-[#adff00] text-black py-5 rounded-2xl font-black text-lg flex items-center justify-center gap-3 hover:bg-[#99e600] transition-all shadow-xl shadow-[#adff00]/20 onboarding-primary-button"
                   >
                     {loading ? <Loader2 className="animate-spin w-6 h-6" /> : mode === 'settings' ? 'Save Settings' : 'Start My Journey'}
                   </button>
@@ -291,6 +295,7 @@ export default function OnboardingModal({
           </div>
 
         </Dialog.Content>
+        </div>
       </Dialog.Portal>
     </Dialog.Root>
   );

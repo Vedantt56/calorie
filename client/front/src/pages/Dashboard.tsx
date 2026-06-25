@@ -352,17 +352,17 @@ export default function Dashboard() {
               </div>
 
               <div style={{ textAlign: "center", marginBottom: "1.25rem" }}>
-                <div style={{ fontSize: "56px", fontWeight: 800, color: T.amberLight, letterSpacing: "-0.03em", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{remaining}</div>
-                <div style={{ fontSize: "10px", fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: T.textMuted, marginTop: "6px" }}>kcal remaining</div>
+                <div className="calorie-remaining-value" style={{ fontSize: "56px", fontWeight: 800, color: T.amberLight, letterSpacing: "-0.03em", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{remaining}</div>
+                <div className="calorie-remaining-label" style={{ fontSize: "10px", fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: T.textMuted, marginTop: "6px" }}>kcal remaining</div>
               </div>
 
               {/* Progress bar */}
               <div style={{ marginBottom: "1.5rem" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "7px" }}>
+                <div className="calorie-progress-labels" style={{ display: "flex", justifyContent: "space-between", marginBottom: "7px" }}>
                   <span style={{ fontSize: "11px", color: T.textMuted }}>{eatenCalories} eaten</span>
                   <span style={{ fontSize: "11px", color: T.textMuted }}>{targets.calories} goal</span>
                 </div>
-                <div style={{ height: "6px", background: "rgba(255,255,255,0.06)", borderRadius: "99px", overflow: "hidden" }}>
+                <div className="calorie-progress-track" style={{ height: "6px", background: "rgba(255,255,255,0.06)", borderRadius: "99px", overflow: "hidden" }}>
                   <div style={{ height: "100%", width: `${calPct}%`, background: `linear-gradient(90deg, ${T.amber}, #f4e7d1)`, borderRadius: "99px", transition: "width 0.8s ease" }} />
                 </div>
               </div>
@@ -392,7 +392,7 @@ export default function Dashboard() {
             <div className="hydration-main">
               <div className="hydration-summary">
                 <div>
-                  <div style={{ fontSize: "42px", fontWeight: 800, color: "#f4f1ea", lineHeight: 1, marginBottom: "6px" }}>{waterIntake}</div>
+                  <div className="hydration-value" style={{ fontSize: "42px", fontWeight: 800, color: "#f4f1ea", lineHeight: 1, marginBottom: "6px" }}>{waterIntake}</div>
                   <div style={{ fontSize: "12px", color: T.textMuted, letterSpacing: "0.14em", textTransform: "uppercase" }}>{waterGoal} ml goal</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
@@ -414,7 +414,7 @@ export default function Dashboard() {
               <div className="hydration-chart-card">
                 <div className="hydration-chart-labels">
                   <span style={{ fontSize: "10px", color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.15em" }}>Trend</span>
-                  <span style={{ fontSize: "12px", fontWeight: 700, color: "#f4f1ea" }}>7-day hydration line</span>
+                  <span className="hydration-chart-title" style={{ fontSize: "12px", fontWeight: 700, color: "#f4f1ea" }}>7-day hydration line</span>
                 </div>
                 <div className="hydration-chart-shell">
                   {hydrationTrend.length ? (
@@ -462,7 +462,7 @@ export default function Dashboard() {
                 { label: "Protein", val: `${eatenProtein}g`, color: "#f97316" },
                 { label: "Fat", val: `${eatenFat}g`, color: "#69b8cc" },
               ].map(m => (
-                <div key={m.label} style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: "12px", padding: "10px 6px", textAlign: "center" }}>
+                <div className="meal-macro-pill" key={m.label} style={{ background: T.surface, border: `1px solid ${T.border}`, borderRadius: "12px", padding: "10px 6px", textAlign: "center" }}>
                   <div style={{ fontSize: "14px", fontWeight: 700, color: m.color }}>{m.val}</div>
                   <div style={{ fontSize: "9px", fontWeight: 600, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.1em", marginTop: "2px" }}>{m.label}</div>
                 </div>
@@ -776,32 +776,34 @@ export default function Dashboard() {
       {/* ── LOG MODAL ── */}
       <Dialog.Root open={isModalOpen} onOpenChange={setIsModalOpen}>
         <Dialog.Portal>
-          <Dialog.Overlay style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(12px)", zIndex: 100 }} />
+          <Dialog.Overlay className="food-logger-overlay" />
           <Dialog.Content className="log-modal">
             <div className="modal-glow" />
+            <div className="modal-glow modal-glow-blue" />
             <div className="modal-dots" />
-            <div style={{ position: "relative", zIndex: 1 }}>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", marginBottom: "1.75rem" }}>
-                <div style={{ width: "52px", height: "52px", borderRadius: "16px", background: "rgba(245,235,185,0.9)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1rem", border: "1px solid rgba(245,179,92,0.25)", boxShadow: "0 8px 32px rgba(245,196,123,0.25)" }}>
+            <div className="food-logger-content" style={{ position: "relative", zIndex: 1 }}>
+              <div className="food-logger-header" style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", marginBottom: "1.75rem" }}>
+                <div className="food-logger-icon" style={{ width: "52px", height: "52px", borderRadius: "16px", background: "rgba(245,235,185,0.9)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1rem", border: "1px solid rgba(245,179,92,0.25)", boxShadow: "0 8px 32px rgba(245,196,123,0.25)" }}>
                   <Zap style={{ width: "22px", height: "22px", color: "#000" }} />
                 </div>
-                <Dialog.Title style={{ fontSize: "20px", fontWeight: 700, color: T.text, margin: "0 0 6px", letterSpacing: "-0.01em" }}>AI Food Logger</Dialog.Title>
-                <Dialog.Description style={{ fontSize: "13px", color: T.textSub, margin: 0, lineHeight: 1.6 }}>
+                <Dialog.Title className="food-logger-title" style={{ fontSize: "20px", fontWeight: 700, color: T.text, margin: "0 0 6px", letterSpacing: "-0.01em" }}>AI Food Logger</Dialog.Title>
+                <Dialog.Description className="food-logger-description" style={{ fontSize: "13px", color: T.textSub, margin: 0, lineHeight: 1.6 }}>
                   Describe your meal naturally.<br />
                   <span style={{ fontStyle: "italic", color: T.textMuted, fontSize: "12px" }}>"I had a large katori of dal and 2 rotis"</span>
                 </Dialog.Description>
               </div>
-              <textarea autoFocus placeholder="Describe your meal here..." value={inputText} onChange={e => setInputText(e.target.value)}
+              <textarea className="food-logger-textarea" autoFocus placeholder="Describe your meal here..." value={inputText} onChange={e => setInputText(e.target.value)}
                 style={{ width: "100%", minHeight: "120px", background: T.surface, border: `1px solid ${T.border}`, borderRadius: "16px", padding: "1rem 1.25rem", fontSize: "14px", color: T.text, outline: "none", resize: "none", fontFamily: "Inter, sans-serif", lineHeight: 1.6, boxSizing: "border-box", transition: "border-color 0.2s" }}
                 onFocus={e => e.target.style.borderColor = "rgba(245,179,92,0.3)"}
                 onBlur={e => e.target.style.borderColor = T.border}
               />
-              <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", margin: "18px 0 8px" }}>
+              <div className="food-logger-meal-types" style={{ display: "flex", gap: "10px", flexWrap: "wrap", margin: "18px 0 8px" }}>
                 {(["breakfast", "lunch", "snacks", "dinner"] as MealType[]).map((type) => (
                   <button
                     key={type}
                     type="button"
                     onClick={() => setSelectedMealType(type)}
+                    className={`food-logger-meal-type ${selectedMealType === type ? "is-active" : ""}`}
                     style={{
                       borderRadius: "12px",
                       padding: "10px 14px",
@@ -817,12 +819,13 @@ export default function Dashboard() {
                   </button>
                 ))}
               </div>
-              <p style={{ fontSize: "10px", fontWeight: 600, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "right", margin: "6px 0 1.25rem" }}>AI Powered</p>
-              <div style={{ display: "flex", gap: "10px" }}>
+              <p className="food-logger-powered" style={{ fontSize: "10px", fontWeight: 600, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.15em", textAlign: "right", margin: "6px 0 1.25rem" }}>AI Powered</p>
+              <div className="food-logger-actions" style={{ display: "flex", gap: "10px" }}>
                 <Dialog.Close asChild>
-                  <button style={{ flex: 1, padding: "13px", borderRadius: "14px", background: T.surface, border: `1px solid ${T.border}`, fontSize: "13px", fontWeight: 600, color: T.textSub, cursor: "pointer" }}>Cancel</button>
+                  <button className="food-logger-cancel" style={{ flex: 1, padding: "13px", borderRadius: "14px", background: T.surface, border: `1px solid ${T.border}`, fontSize: "13px", fontWeight: 600, color: T.textSub, cursor: "pointer" }}>Cancel</button>
                 </Dialog.Close>
                 <button onClick={handleSmartLog} disabled={isLogging || !inputText.trim()}
+                  className="food-logger-submit"
                   style={{ flex: 2, padding: "13px", borderRadius: "14px", background: T.amberLight, border: "none", fontSize: "13px", fontWeight: 700, color: "#000", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", opacity: isLogging || !inputText.trim() ? 0.5 : 1, boxShadow: "0 8px 24px rgba(245,179,92,0.2)" }}>
                   {isLogging ? <><Loader2 style={{ width: "15px", height: "15px", animation: "spin 1s linear infinite" }} /> Processing...</> : <><Plus style={{ width: "15px", height: "15px" }} /> Add to Diary</>}
                 </button>
@@ -1140,17 +1143,52 @@ export default function Dashboard() {
         .mobile-fab:active { transform: scale(0.93); background: #fde68a; }
 
         /* ── LOG MODAL ── */
+        .food-logger-overlay {
+          position: fixed; inset: 0; z-index: 100;
+          background:
+            radial-gradient(circle at 22% 18%, rgba(245,179,92,0.09), transparent 34%),
+            radial-gradient(circle at 78% 76%, rgba(105,184,204,0.07), transparent 30%),
+            rgba(2,2,3,0.72);
+        }
         .log-modal {
           position: fixed; left: 50%; top: 50%; transform: translate(-50%,-50%);
-          background: rgba(10,10,12,0.98); border: 1px solid rgba(255,255,255,0.07);
-          border-radius: 24px; padding: 2rem; z-index: 101;
-          width: 92vw; max-width: 460px;
-          backdrop-filter: blur(24px);
-          box-shadow: 0 40px 120px rgba(0,0,0,0.8); outline: none;
+          background: linear-gradient(145deg, rgba(26,24,21,0.84), rgba(7,9,11,0.9)); border: 1px solid rgba(255,241,219,0.16);
+          border-radius: 30px; padding: 2rem; z-index: 101;
+          width: 92vw; max-width: 520px;
+          backdrop-filter: blur(34px) saturate(1.18);
+          -webkit-backdrop-filter: blur(34px) saturate(1.18);
+          box-shadow: 0 42px 130px rgba(0,0,0,0.72), inset 0 1px 0 rgba(255,255,255,0.12); outline: none;
           overflow: hidden;
         }
-        .modal-glow { position: absolute; left: -20%; top: -20%; width: 70%; height: 70%; border-radius: 50%; background: radial-gradient(ellipse, rgba(245,179,92,0.12), transparent 68%); filter: blur(40px); pointer-events: none; }
-        .modal-dots { position: absolute; inset: 0; opacity: 0.05; background-image: radial-gradient(circle, rgba(244,241,234,0.5) 0 1px, transparent 1.5px); background-size: 28px 28px; pointer-events: none; }
+        .log-modal::before { content: ""; position: absolute; inset: 1px; border-radius: 29px; pointer-events: none; background: linear-gradient(130deg, rgba(255,255,255,0.09), transparent 28%, transparent 72%, rgba(105,184,204,0.04)); }
+        .modal-glow { position: absolute; left: -24%; top: -28%; width: 75%; height: 75%; border-radius: 50%; background: radial-gradient(ellipse, rgba(245,179,92,0.3), transparent 68%); filter: blur(54px); opacity: 0.55; pointer-events: none; }
+        .modal-glow-blue { left: auto; top: auto; right: -34%; bottom: -34%; background: radial-gradient(ellipse, rgba(105,184,204,0.24), transparent 68%); opacity: 0.4; }
+        .modal-dots { position: absolute; inset: 0; opacity: 0.07; background-image: radial-gradient(circle, rgba(244,241,234,0.45) 0 1px, transparent 1.5px); background-size: 24px 24px; mask-image: linear-gradient(to bottom, #000, transparent 68%); pointer-events: none; }
+        .food-logger-icon { background: linear-gradient(145deg, #f8dfb5, #f5b35c) !important; border-color: rgba(255,225,180,0.5) !important; box-shadow: 0 12px 34px rgba(245,179,92,0.24), inset 0 1px 0 rgba(255,255,255,0.55) !important; }
+        .food-logger-title { color: #f4f1ea !important; font-size: 22px !important; letter-spacing: -0.025em !important; }
+        .food-logger-description { color: rgba(244,241,234,0.62) !important; }
+        .food-logger-description span { color: rgba(244,241,234,0.38) !important; }
+        .food-logger-textarea { min-height: 138px !important; padding: 1rem 1.15rem !important; border: 1px solid rgba(255,255,255,0.09) !important; border-radius: 18px !important; background: rgba(255,255,255,0.045) !important; color: #f4f1ea !important; caret-color: #f5b35c; box-shadow: inset 0 1px 0 rgba(255,255,255,0.035); }
+        .food-logger-textarea::placeholder { color: rgba(244,241,234,0.3); }
+        .food-logger-textarea:focus { border-color: rgba(245,179,92,0.62) !important; background: rgba(255,255,255,0.065) !important; box-shadow: 0 0 0 4px rgba(245,179,92,0.09), inset 0 1px 0 rgba(255,255,255,0.05); }
+        .food-logger-meal-types { display: grid !important; grid-template-columns: repeat(4,minmax(0,1fr)); }
+        .food-logger-meal-type { min-height: 44px; padding: 10px 8px !important; border: 1px solid rgba(255,255,255,0.08) !important; border-radius: 14px !important; background: rgba(255,255,255,0.035) !important; color: rgba(244,241,234,0.62) !important; transition: transform .16s, background .16s, border-color .16s, color .16s; }
+        .food-logger-meal-type:hover { transform: translateY(-1px); background: rgba(255,255,255,0.065) !important; color: #f4f1ea !important; }
+        .food-logger-meal-type.is-active { border-color: rgba(245,179,92,0.58) !important; background: linear-gradient(135deg, rgba(245,179,92,0.2), rgba(245,179,92,0.07)) !important; color: #f5c47f !important; box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); }
+        .food-logger-powered { color: rgba(244,241,234,0.32) !important; font-size: 9px !important; letter-spacing: .2em !important; }
+        .food-logger-actions { gap: 12px !important; }
+        .food-logger-cancel, .food-logger-submit { min-height: 50px; border-radius: 15px !important; }
+        .food-logger-cancel { border: 1px solid rgba(255,255,255,0.09) !important; background: rgba(255,255,255,0.035) !important; color: rgba(244,241,234,0.62) !important; }
+        .food-logger-cancel:hover { background: rgba(255,255,255,0.07) !important; color: #f4f1ea !important; }
+        .food-logger-submit { border: 1px solid rgba(255,225,180,0.38) !important; background: linear-gradient(135deg, #f8d49d, #f5b35c 58%, #dd8e3b) !important; color: #17120d !important; box-shadow: 0 12px 30px rgba(245,179,92,0.2), inset 0 1px 0 rgba(255,255,255,0.45) !important; }
+        .food-logger-submit:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.05); }
+        .food-logger-submit:disabled { cursor: not-allowed !important; opacity: .42 !important; filter: grayscale(.35); box-shadow: none !important; }
+        @media (max-width: 520px) {
+          .log-modal { padding: 1.35rem; border-radius: 24px; }
+          .food-logger-meal-types { grid-template-columns: repeat(2,minmax(0,1fr)); }
+          .food-logger-actions { flex-direction: column-reverse; }
+          .food-logger-cancel, .food-logger-submit { width: 100%; flex: auto !important; }
+        }
 
         /* ── TABLET: 768px+ ── */
         @media (min-width: 768px) {
@@ -1204,23 +1242,23 @@ function MacroRing({ label, eaten, target, color }: { label: string; eaten: numb
   const r = 26; const circ = 2 * Math.PI * r;
   const pct = Math.min((eaten / target) * 100, 100) || 0;
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "5px" }}>
-      <div style={{ position: "relative", width: "64px", height: "64px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+    <div className="macro-ring" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "5px" }}>
+      <div className="macro-ring-visual" style={{ position: "relative", width: "64px", height: "64px", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <svg style={{ transform: "rotate(-90deg)", position: "absolute" }} width="64" height="64" viewBox="0 0 64 64">
-          <circle cx="32" cy="32" r={r} stroke="rgba(255,255,255,0.06)" strokeWidth="5.5" fill="none" />
+          <circle className="macro-ring-track" cx="32" cy="32" r={r} stroke="rgba(255,255,255,0.06)" strokeWidth="5.5" fill="none" />
           <circle cx="32" cy="32" r={r} stroke={color} strokeWidth="5.5" fill="none" strokeDasharray={circ} strokeDashoffset={circ - (pct / 100) * circ} strokeLinecap="round" style={{ transition: "stroke-dashoffset 1s ease" }} />
         </svg>
-        <span style={{ fontSize: "11px", fontWeight: 700, color: "rgba(255,255,255,0.8)", position: "relative" }}>{Math.round(pct)}%</span>
+        <span className="macro-ring-percent" style={{ fontSize: "11px", fontWeight: 700, color: "rgba(255,255,255,0.8)", position: "relative" }}>{Math.round(pct)}%</span>
       </div>
-      <span style={{ fontSize: "10px", fontWeight: 600, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.1em" }}>{label}</span>
-      <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.22)" }}>{eaten}/{target}g</span>
+      <span className="macro-ring-label" style={{ fontSize: "10px", fontWeight: 600, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.1em" }}>{label}</span>
+      <span className="macro-ring-amount" style={{ fontSize: "10px", color: "rgba(255,255,255,0.22)" }}>{eaten}/{target}g</span>
     </div>
   );
 }
 
 function ActionCard({ color, icon, title, sub, locked, onClick }: { color: string; icon: React.ReactNode; title: string; sub: string; locked?: boolean; onClick?: () => void }) {
   return (
-    <div style={{ borderRadius: "18px", padding: "1.3rem", background: `${color}12`, border: `1px solid ${color}22`, cursor: locked ? "default" : onClick ? "pointer" : "default", transition: "transform 0.2s", minHeight: "150px", display: "flex", flexDirection: "column", justifyContent: "space-between", position: "relative" }}
+    <div className="dashboard-action-card" style={{ borderRadius: "18px", padding: "1.3rem", background: `${color}12`, border: `1px solid ${color}22`, cursor: locked ? "default" : onClick ? "pointer" : "default", transition: "transform 0.2s", minHeight: "150px", display: "flex", flexDirection: "column", justifyContent: "space-between", position: "relative" }}
       onClick={locked ? undefined : onClick}
       onMouseOver={e => { if (!locked && onClick) (e.currentTarget as HTMLElement).style.transform = "translateY(-3px)"; }}
       onMouseOut={e => { if (!locked && onClick) (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; }}
@@ -1231,12 +1269,12 @@ function ActionCard({ color, icon, title, sub, locked, onClick }: { color: strin
           <span style={{ fontSize: "8px", fontWeight: 700, color: "#f5b35c", textTransform: "uppercase", letterSpacing: "0.1em" }}>Pro</span>
         </div>
       )}
-      <div style={{ width: "36px", height: "36px", borderRadius: "11px", background: `${color}18`, border: `1px solid ${color}28`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div className="dashboard-action-icon" style={{ width: "36px", height: "36px", borderRadius: "11px", background: `${color}18`, border: `1px solid ${color}28`, display: "flex", alignItems: "center", justifyContent: "center" }}>
         {React.isValidElement(icon) && React.cloneElement(icon as React.ReactElement<any>, { style: { width: "17px", height: "17px", color } })}
       </div>
       <div>
-        <h4 style={{ fontSize: "13px", fontWeight: 700, color: "#f4f1ea", margin: "0 0 3px", lineHeight: 1.2 }}>{title}</h4>
-        <p style={{ fontSize: "9px", fontWeight: 600, color: `${color}99`, textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>{sub}</p>
+        <h4 className="dashboard-action-title" style={{ fontSize: "13px", fontWeight: 700, color: "#f4f1ea", margin: "0 0 3px", lineHeight: 1.2 }}>{title}</h4>
+        <p className="dashboard-action-subtitle" style={{ fontSize: "9px", fontWeight: 600, color: `${color}99`, textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>{sub}</p>
       </div>
     </div>
   );

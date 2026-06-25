@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Flame, Mail, Lock, User, ArrowRight, Loader2, Eye, EyeOff, Sparkles, ShieldCheck } from 'lucide-react';
+import { Flame, Mail, Lock, User, ArrowLeft, ArrowRight, Loader2, Eye, EyeOff, Sparkles, ShieldCheck } from 'lucide-react';
 
 interface AuthPageProps {
   initialMode?: 'login' | 'register';
@@ -92,6 +92,16 @@ export default function AuthPage({ initialMode = 'login' }: AuthPageProps) {
 
   return (
     <div className="min-h-screen bg-[#050506] flex items-center justify-center p-4 md:p-8 relative overflow-hidden font-sans select-none selection:bg-amber-500/20">
+
+      <button
+        type="button"
+        onClick={() => navigate('/')}
+        aria-label="Back to landing page"
+        className="absolute left-4 top-4 md:left-8 md:top-8 z-50 inline-flex items-center gap-2 rounded-xl border border-white/10 bg-black/30 px-3.5 py-2.5 text-xs font-semibold text-zinc-300 backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:border-[#f5b35c]/30 hover:bg-[#f5b35c]/10 hover:text-[#f4e7d1] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#f5b35c]"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        <span>Back to home</span>
+      </button>
 
       {/* Cinematic Dynamic Background Atmosphere */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">

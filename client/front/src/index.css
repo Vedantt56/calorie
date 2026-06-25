@@ -1062,6 +1062,129 @@ html[data-theme="light"] .water-card-glow {
   opacity: 0.22;
 }
 
+html[data-theme="light"] .calorie-card {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(176, 90, 54, 0.08), transparent 34%),
+    rgba(255, 255, 255, 0.76) !important;
+  border-color: rgba(176, 90, 54, 0.2) !important;
+}
+
+html[data-theme="light"] .calorie-remaining-value {
+  color: #8f462d !important;
+  text-shadow: 0 8px 28px rgba(176, 90, 54, 0.13);
+}
+
+html[data-theme="light"] .calorie-remaining-label,
+html[data-theme="light"] .calorie-progress-labels span,
+html[data-theme="light"] .macro-ring-label {
+  color: rgba(42, 43, 47, 0.68) !important;
+}
+
+html[data-theme="light"] .calorie-progress-track {
+  background: rgba(42, 43, 47, 0.11) !important;
+}
+
+html[data-theme="light"] .macro-ring-track {
+  stroke: rgba(42, 43, 47, 0.13) !important;
+}
+
+html[data-theme="light"] .macro-ring-percent {
+  color: #2a2b2f !important;
+}
+
+html[data-theme="light"] .macro-ring-amount {
+  color: rgba(42, 43, 47, 0.56) !important;
+}
+
+html[data-theme="light"] .hydration-card {
+  background:
+    radial-gradient(circle at 90% 20%, rgba(56, 189, 248, 0.1), transparent 38%),
+    rgba(255, 255, 255, 0.78) !important;
+  border-color: rgba(56, 189, 248, 0.28) !important;
+}
+
+html[data-theme="light"] .hydration-value,
+html[data-theme="light"] .hydration-chart-title {
+  color: #2a2b2f !important;
+}
+
+html[data-theme="light"] .hydration-progress-track {
+  background: rgba(42, 43, 47, 0.1) !important;
+}
+
+html[data-theme="light"] .hydration-open-btn {
+  background: rgba(56, 189, 248, 0.13) !important;
+  border-color: rgba(14, 116, 144, 0.18) !important;
+  color: #087ea4 !important;
+}
+
+html[data-theme="light"] .meal-macro-pill {
+  background: rgba(42, 43, 47, 0.035) !important;
+  border-color: rgba(42, 43, 47, 0.1) !important;
+}
+
+html[data-theme="light"] .dashboard-action-card {
+  background: rgba(255, 255, 255, 0.66) !important;
+  border-color: rgba(42, 43, 47, 0.12) !important;
+  box-shadow: rgba(42, 43, 47, 0.06) 0 12px 32px;
+}
+
+html[data-theme="light"] .dashboard-action-title {
+  color: #2a2b2f !important;
+}
+
+html[data-theme="light"] .dashboard-action-subtitle {
+  color: rgba(42, 43, 47, 0.62) !important;
+}
+
+html[data-theme="light"] .card-dots {
+  opacity: 0.05;
+  background-image: radial-gradient(circle, rgba(42, 43, 47, 0.32) 0 1px, transparent 1.5px);
+}
+
+html[data-theme="light"] .food-logger-overlay {
+  background:
+    radial-gradient(circle at 22% 18%, rgba(176, 90, 54, 0.1), transparent 34%),
+    rgba(42, 43, 47, 0.46) !important;
+}
+
+html[data-theme="light"] .log-modal {
+  background: linear-gradient(145deg, rgba(255, 253, 248, 0.9), rgba(245, 238, 225, 0.84)) !important;
+  border-color: rgba(255, 255, 255, 0.72) !important;
+  box-shadow: 0 38px 100px rgba(42, 43, 47, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.94) !important;
+}
+
+html[data-theme="light"] .food-logger-title {
+  color: #2a2b2f !important;
+}
+
+html[data-theme="light"] .food-logger-description {
+  color: rgba(51, 51, 51, 0.72) !important;
+}
+
+html[data-theme="light"] .food-logger-description span,
+html[data-theme="light"] .food-logger-powered {
+  color: rgba(81, 81, 81, 0.62) !important;
+}
+
+html[data-theme="light"] .food-logger-textarea,
+html[data-theme="light"] .food-logger-meal-type,
+html[data-theme="light"] .food-logger-cancel {
+  background: rgba(255, 255, 255, 0.5) !important;
+  border-color: rgba(128, 137, 136, 0.25) !important;
+  color: #2a2b2f !important;
+}
+
+html[data-theme="light"] .food-logger-textarea::placeholder {
+  color: rgba(81, 81, 81, 0.55) !important;
+}
+
+html[data-theme="light"] .food-logger-meal-type.is-active {
+  border-color: rgba(176, 90, 54, 0.48) !important;
+  background: linear-gradient(135deg, rgba(176, 90, 54, 0.15), rgba(176, 90, 54, 0.05)) !important;
+  color: #8f462d !important;
+}
+
 @keyframes dashboardFadeIn {
   from {
     opacity: 0;
